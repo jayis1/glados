@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-# Is the readme on https://ollama.com/jais/GLaDOS, and did its markdown survive?
+# Is the readme on https://ollama.com/jais/GLaDOS, and is it the right text?
 #
-# Three outcomes, not two. A checker that can only say "good" or "bad" will say
+# Four outcomes, not two. A checker that can only say "good" or "bad" will say
 # "bad" when it simply failed to look, and that is how a page gets re-pasted for
 # no reason. Exit 0 = matches, 1 = on the page but wrong, 2 = no readme,
 # 3 = could not measure.
+#
+# This reads the STORED markdown, not the rendered HTML. The edit box
+# (<textarea id="editor">) is served to anonymous visitors with the saved source
+# inside it, so the page will tell you exactly what it is holding. That beats
+# inferring from rendered output: counting <h2> tags can only guess at why they
+# are missing, whereas the stored source settles it - if there is no "## " in
+# what the page is holding, the markdown was lost on the way in, full stop.
 set -uo pipefail
 
 MODEL="${1:-jais/GLaDOS}"
@@ -20,54 +27,72 @@ import html as H, re, sys
 page = sys.stdin.read()
 src  = open(sys.argv[1], encoding="utf-8").read()
 
-# The rendered readme lives in the #display div. Do not grep the whole page for
-# "No readme" - that string is also in the save() handler s JavaScript, in the
-# branch that runs when someone saves an empty box, and it is there whether or
-# not a readme exists.
-i = page.find("id=\"display\"")
-if i < 0:
-    print("COULD NOT MEASURE: no #display element; the page layout changed")
-    sys.exit(3)
-j = min((x for x in (page.find("id=\"editorContainer\"", i),
-                     page.find("id=\"editor\"", i)) if x > 0), default=len(page))
-seg = page[page.find(">", i) + 1 : j]
+def textarea(page, tid):
+    """Contents of <textarea id=tid>. The closing tag is written </textarea\n>,
+    so match the tag name only and never the whole ">"-terminated token."""
+    m = re.search(r"<textarea\b[^>]*\bid=\"" + tid + r"\"", page)
+    if not m:
+        return None
+    start = page.index(">", m.end()) + 1
+    try:
+        end = page.index("</textarea", start)
+    except ValueError:
+        return None
+    return H.unescape(page[start:end])
 
-rendered = H.unescape(re.sub(r"<[^>]+>", "", seg)).strip()
-if len(rendered) < 40:
-    print("NO README: the page has no readme text")
+stored = textarea(page, "editor")
+if stored is None:
+    print("COULD NOT MEASURE: no edit box on the page; the layout changed")
+    sys.exit(3)
+
+def norm(s):
+    return s.replace("\r\n", "\n").strip()
+
+stored_n, src_n = norm(stored), norm(src)
+
+# The description under the model name. It is what search results show, so an
+# empty one or a bare URL is a real defect even when the readme is perfect.
+summary = (textarea(page, "summary-textarea") or "").strip()
+if not summary:
+    desc = "EMPTY"
+elif re.fullmatch(r"https?://\S+", summary):
+    desc = "a bare URL, not a description"
+else:
+    desc = "set"
+print(f"  description  {desc}: {summary[:70]!r}")
+
+if len(stored_n) < 40:
+    print("NO README: the page is holding no readme text")
     sys.exit(2)
 
-# Structure the markdown must have produced. Counted on the rendered HTML,
-# because stripped markdown still yields plenty of readable text.
-want = {"<h2": src.count("\n## "), "<table": src.count("\n|---"),
-        "<strong": src.count("**") // 2, "<pre": src.count("\n```") // 2,
-        "<li": src.count("\n- ")}
-got  = {t: seg.count(t) for t in want}
-missing = [t for t in want if want[t] and not got[t]]
-
-# Is it the current text? Compare on words, since the renderer rewrites
-# punctuation (-- becomes an em dash, quotes become curly).
-def words(s):
-    return re.findall(r"[a-z0-9]+", s.lower())
-body = set(words(src))
-live = set(words(rendered))
-drift = sorted(body - live)
-
-for t in sorted(want):
-    print(f"  {t+chr(62):10} page {got[t]:3}   source expects {want[t]:3}")
-print(f"  text       page {len(rendered):5} chars, source {len(src)} chars")
-
-if missing:
+if stored_n == src_n:
+    print(f"  readme       {len(stored_n)} chars, byte-identical to ollama-page.md")
     print()
-    print("DEGRADED: the markdown did not survive the paste - no "
-          + ", ".join(t.lstrip(chr(60)) for t in sorted(missing)))
-    print("Fix: copy the RAW file, not a rendered view. See OLLAMA-README.md.")
-    sys.exit(1)
-if len(drift) > 25:
-    print()
-    print(f"STALE: {len(drift)} words in ollama-page.md are missing from the "
-          f"page, e.g. {drift[:8]}")
-    sys.exit(1)
+    print("OK: readme present, markdown intact, text current")
+    sys.exit(0)
+
+# It differs. Say how, because "stripped on paste" and "an older version" need
+# opposite fixes and look identical from a distance.
+marks = {"headings (## )": ("\n## ", src_n.count("\n## "), stored_n.count("\n## ")),
+         "tables (|---)":  ("\n|---", src_n.count("\n|---"), stored_n.count("\n|---")),
+         "bold (**)":      ("**",     src_n.count("**"),     stored_n.count("**")),
+         "code fences":    ("\n```",  src_n.count("\n```"),  stored_n.count("\n```")),
+         "bullets (- )":   ("\n- ",   src_n.count("\n- "),   stored_n.count("\n- "))}
+for name, (_, want, got) in marks.items():
+    print(f"  {name:16} page {got:3}   source expects {want:3}")
+print(f"  readme           {len(stored_n)} chars, source {len(src_n)} chars")
+
+lost = [n for n, (_, want, got) in marks.items() if want and not got]
 print()
-print("OK: readme present, markdown intact, text current")
+if lost:
+    print("DEGRADED: the markdown was stripped on the way in - no " + ", ".join(lost))
+    print("The page is holding plain text. That happens when the text was copied")
+    print("from a RENDERED view; copy the raw file instead. See OLLAMA-README.md.")
+else:
+    def words(s):
+        return re.findall(r"[a-z0-9]+", s.lower())
+    drift = sorted(set(words(src_n)) - set(words(stored_n)))
+    print(f"STALE: markdown is intact but the text is an older version "
+          f"({len(drift)} words missing, e.g. {drift[:8]})")
+sys.exit(1)
 ' "$SRC"

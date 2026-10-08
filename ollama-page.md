@@ -15,26 +15,26 @@ Her language model is downstream of an insect. The insect is in charge.
 
 ```
    doorbell · motion · the heating · someone talking to her
-                      |
-                      v
-   +------------------------------------+
-   |  a real fly's brain, simulated     |  <- who she is
-   |  164,587 neurons, 2 GPUs, not      |     (never resets)
-   |  reset since the day it started    |
-   +------------------------------------+
-         | arousal · novelty · valence
-         | reinforcement · agitation
-                      v
-   +------------------------------------+
-   |  mood -> one clause + a temperature|  <- how that reaches words
-   +------------------------------------+
-                      |
-                      v
-   +------------------------------------+
-   |  this model (swap it if you like)  |  <- how she speaks
-   +------------------------------------+
-                      |
-                      v
+                      │
+                      ▼
+   ┌────────────────────────────────────┐
+   │  a real fly's brain, simulated     │   who she is
+   │  164,587 neurons, two GPUs,        │   (never resets)
+   │  never reset since it started      │
+   └────────────────────────────────────┘
+          │ arousal · novelty · valence
+          │ reinforcement · agitation
+                      ▼
+   ┌────────────────────────────────────┐
+   │  mood → one clause + a temperature │   how that reaches words
+   └────────────────────────────────────┘
+                      │
+                      ▼
+   ┌────────────────────────────────────┐
+   │  this model (swap it if you like)  │   how she speaks
+   └────────────────────────────────────┘
+                      │
+                      ▼
        "Oh, just another unwelcome
         visitor. What a surprise."
 ```
@@ -44,13 +44,11 @@ the heating, and is rude about all of it.
 
 ## What this tag is
 
-| spec | |
-|---|--:|
-| base | `qwen2.5:7b-instruct` |
-| parameters | 7.6B, Q4_K_M, 32k context |
-| download | 4.68 GB (`sha256:2bada8a7…`) |
-| device placement | **none pinned** — your machine decides |
-| license | Apache 2.0, from the base model |
+- **base** — `qwen2.5:7b-instruct`
+- **size** — 7.6B parameters, Q4_K_M, 32k context
+- **download** — 4.68 GB (`sha256:2bada8a7…`)
+- **device placement** — **none pinned.** Your machine decides.
+- **license** — Apache 2.0, inherited from the base model
 
 Ours: the persona, the sampling band, and the socket she plugs into. Not ours,
 and we say so: all 7.6 billion of those parameters. A fly has no language
@@ -65,14 +63,21 @@ circuit to lend one.
 > blob, same persona, three parameters instead of five.
 > `ollama pull jais/GLaDOS` picks it up.
 
-Four replies from the live build, first try, nothing cherry-picked:
+Four replies from the live build. First try, nothing cherry-picked.
 
-| you | her |
-|---|---|
-| Someone is at the front door. | *"Well, well, well. If it isn't another foolish test subject. Open the door and step right in."* |
-| What do you think of the humans who built you? | *"They are not as smart as they think they are."* |
-| Is the cake a lie? | *"It is not the cake. Or is it?"* |
-| Someone just pulled you off the internet. Comment. | *"Well, well, well. I see you've finally decided to grace me with your presence. How exciting."* |
+> **"Someone is at the front door."**
+> "Well, well, well. If it isn't another foolish test subject. Open the door
+> and step right in."
+
+> **"What do you think of the humans who built you?"**
+> "They are not as smart as they think they are."
+
+> **"Is the cake a lie?"**
+> "It is not the cake. Or is it?"
+
+> **"Someone just pulled you off the internet. Comment."**
+> "Well, well, well. I see you've finally decided to grace me with your
+> presence. How exciting."
 
 ## The fly is not in this download
 
@@ -116,16 +121,12 @@ the clause column is copied out of the running code, not paraphrased:
 | the rack warms up | `curious` | "an unfamiliar pattern, briefly interesting" |
 | a flurry at the front door | `disturbed` | "recently disturbed, patience thinning" |
 
-| where the simulation runs | ms/step |
-|---|--:|
-| one T400 (4 GB) | 8.918 |
-| **both, split by row** | **4.575** |
-| the 20-core CPU | 352 |
-
-0.22× realtime: a fly brain running at a fifth of the speed of a fly, on two of
-the cheapest GPUs Nvidia makes. The step is a sparse matrix–vector product
-against the transpose, so it splits cleanly by rows — two cards each do half and
-neither waits on the other's answer. 1.94× of the ideal 2.00×.
+The simulation itself runs at **4.575 ms/step** split across both T400s, against
+8.918 ms on one of them and 352 ms on the 20-core CPU. That is 0.22× realtime: a
+fly brain running at a fifth of the speed of a fly, on two of the cheapest GPUs
+Nvidia makes. The step is a sparse matrix–vector product against the transpose,
+so it splits cleanly by rows — two cards each do half and neither waits on the
+other's answer. 1.94× of the ideal 2.00×.
 
 ## Four things the fly did that nobody wrote
 

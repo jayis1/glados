@@ -1,0 +1,33 @@
+{
+  "description_field": {
+    "problem": "a bare URL, not a description; this is what ollama.com search results show",
+    "value": "https://github.com/jayis1/glados"
+  },
+  "measured_at": "2026-10-08T21:05:00Z",
+  "parse_traps": [
+    "closing tag is written </textarea\\n>, so '</textarea>' matches nothing",
+    "the element is name=\"markdown\" but the SAVE posts field 'readme'; the name belongs to the preview form"
+  ],
+  "route": "GET https://ollama.com/jais/GLaDOS (anonymous)",
+  "source_ollama_page_md": {
+    "bold_**": 98,
+    "bullets": 10,
+    "chars": 12910,
+    "code_fences": 8,
+    "headings_##": 8,
+    "table_seps": 3,
+    "tabs": 0
+  },
+  "stored_readme": {
+    "bold_**": 0,
+    "bullets": 0,
+    "chars": 10103,
+    "code_fences": 0,
+    "headings_##": 0,
+    "table_seps": 0,
+    "tabs": 18
+  },
+  "stored_readme_first_line": "An AI whose moods come from a fruit fly.",
+  "verdict": "DEGRADED - every markdown construct is absent from the STORED text while 18 tab characters are present, which is a table copied out of a rendered view. Proven from the stored source, not inferred from rendering.",
+  "why": "The edit box is served to anonymous visitors with the saved markdown inside it, so the page's stored readme can be read back directly. This replaces inferring the state of the page from rendered HTML: 'no <h2> tags' has several causes, 'the stored text contains no ## at all' has one."
+}

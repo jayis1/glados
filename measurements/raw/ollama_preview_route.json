@@ -4,7 +4,23 @@
   "body_head": "Unauthorized (ref: a68464eb-0a76-4218-9778-4680444f85cf)\n",
   "conclusion": "cookie-gated, like the write route",
   "measured_at": "2026-10-08T20:14:03Z",
+  "note": "Re-asked in both plausible shapes so a 401 cannot be an artefact of the wrong content type. The page's preview() constructs a FormData from #markdownForm and then discards it, posting the raw textarea value instead.",
+  "reconfirmed_at": "2026-10-08T21:05:00Z",
   "route": "POST https://ollama.com/jais/GLaDOS/preview",
+  "shapes_asked": [
+    {
+      "body": "Unauthorized",
+      "measured_at": "2026-10-08T21:05:00Z",
+      "shape": "raw markdown as the request body (what preview() sends)",
+      "status": 401
+    },
+    {
+      "body": "Unauthorized",
+      "measured_at": "2026-10-08T21:05:00Z",
+      "shape": "form-encoded readme=<markdown>",
+      "status": 401
+    }
+  ],
   "status": 401,
   "why": "The model page's Edit box has a Preview tab. If its render route were open, the exact rendering could be verified before pasting. It is not."
 }

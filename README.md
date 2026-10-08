@@ -92,10 +92,12 @@ still exits **0**, so its exit status is not evidence of an upload.
 
 The model page's *readme* is a separate thing again, and nothing in a Modelfile
 or a push carries it — it is a cookie-authenticated form in the web UI. The text
-is [`ollama-page.md`](ollama-page.md), the two ways to get it there are in
-[`OLLAMA-README.md`](OLLAMA-README.md), and `./check-ollama-page.sh` says
-whether the live page actually has it. **Copy from the raw file.** Pasting from
-a rendered view strips every heading, table and code fence while still looking
+is [`ollama-page.md`](ollama-page.md), the three routes for getting it there are
+in [`OLLAMA-README.md`](OLLAMA-README.md), and `./check-ollama-page.sh` says
+whether the live page actually has it — by reading the markdown the page stores
+in its own edit box, which is served to anonymous visitors, so the answer is a
+comparison rather than an inference. **Copy from the raw file.** Pasting from a
+rendered view strips every heading, table and code fence while still looking
 like prose, which is exactly how this page spent its first evening.
 
 </details>

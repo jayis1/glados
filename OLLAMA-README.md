@@ -32,31 +32,64 @@ machine holds, and re-reads the page afterwards:
 The probe signs correctly — it checks its own Ed25519 implementation against
 RFC 8032 test vector 1 before trusting a result, and the registry really does
 issue it a token — so these are refusals, not malformed requests. The page's
-readme was byte-identical afterwards at 9,958 characters, so none of the
-refused writes wrote anything. Raw:
-`measurements/raw/ollama_readme_auth_probe.json`.
+readme was byte-identical afterwards, so none of the refused writes wrote
+anything. Raw: `measurements/raw/ollama_readme_auth_probe.json`.
 
 One honest limit: no credential here could be shown to carry *push* rights
 either, so this does not separate "the route ignores registry tokens" from
 "this key is not authorized". Either way the write needs a browser.
 
-The Edit box also has a **Preview** tab, which posts the markdown to
-`POST /jais/GLaDOS/preview` and gets rendered HTML back. If that route were
-open, the exact rendering of this page could be verified before anyone pasted
-anything. It is cookie-gated too — `401`, asked with the real 12,980-byte body:
-`measurements/raw/ollama_preview_route.json`. Signed in, you have it; nothing
-here does.
+The Edit box also has a **Preview** tab, which renders markdown without saving
+it. If that route were open, the exact rendering of this page could be verified
+before anyone pasted anything. It is cookie-gated too, asked in **both** shapes
+it could plausibly want — the raw markdown as the request body (which is what
+the page's own `preview()` sends; it builds a `FormData` and then never uses
+it), and form-encoded. `401` either way, so this is a closed route and not a
+malformed request. `measurements/raw/ollama_preview_route.json`.
+
+## The page will tell you what it is holding
+
+The edit box is served to **anonymous** visitors with the saved markdown inside
+it:
+
+```html
+<textarea id="editor" name="markdown">…the stored readme…</textarea>
+```
+
+So there is no need to infer the state of the page from its rendered HTML —
+read the source back and compare it. That is what `check-ollama-page.sh` now
+does, and it is the difference between *"I counted no `<h2>` tags"* and *"the
+text this page is storing contains no `## ` at all"*. The first has several
+possible causes; the second has one.
+
+Two traps when reading it. The closing tag is written `</textarea\n>`, so
+matching `</textarea>` finds nothing. And `name="markdown"` on that element is
+**not** the field the save posts — that name belongs to the preview form; the
+save sends `readme`. Reading the field name off the textarea and writing
+`markdown:` into the save call produces a request that looks right and sets
+nothing.
 
 ## ⚠️ Copy the raw markdown, not the rendered page
 
-This went wrong once already. The page was filled from a *rendered* view, which
-copies the text and throws the markup away. The result still reads, so nothing
-looks broken — but there is not one heading, table, bold word or code fence left
-on the page, and ollama.com's renderer then applies smart punctuation to the
-plain text, which turns the ASCII diagram's `+------+` borders into
-`+——————+`.
+This went wrong once already, and it is now proven rather than inferred. Read
+straight out of the page's own edit box, the stored text contains:
 
-Measured against the live page: `<h2>` 0, `<table>` 0, `<strong>` 0, `<li>` 0.
+| construct | stored on the page | the source has |
+|---|--:|--:|
+| headings (`## `) | **0** | 8 |
+| tables (`\|---`) | **0** | 3 |
+| bold (`**`) | **0** | 98 |
+| code fences | **0** | 8 |
+| bullets (`- `) | **0** | 10 |
+
+Not one heading, table, bold word or code fence survived. What it does contain
+is 18 tab characters — the tell of a table copied out of a *rendered* view,
+which takes the text and throws the markup away. ollama.com then applies smart
+punctuation to the resulting plain text, which is what turned the ASCII
+diagram's `+------+` borders into `+——————+`.
+
+The result still reads, so nothing looks broken. That is exactly why it survived
+unnoticed.
 
 **Copy from the raw file**, where the markdown is still markdown:
 
@@ -74,15 +107,16 @@ That raw link has nothing in it but the page text, so there is nothing to trim:
 4. `Ctrl+V`, then **Save**.
 
 **Check it before you save.** The edit box has a **Preview** tab. A good paste
-previews as headings, six tables and a boxed ASCII diagram. A bad one previews
-as an unbroken wall of grey text — that is the rendered-view paste, and the fix
-is to go back to the raw link. This is the one failure that still reads fine
+previews as headings, three tables and a boxed diagram. A bad one previews as an
+unbroken wall of grey text — that is the rendered-view paste, and the fix is to
+go back to the raw link. This is the one failure that still reads fine
 afterwards, so it is worth the extra click.
 
 ## Route 2 — one line in the console
 
-Same endpoint, same session, no 12 KB in a textarea. On the model page, signed
-in, press `F12` and go to **Console**:
+Same endpoint, same session, no 13 KB in a textarea. **No clipboard is involved,
+so the stripping failure above cannot happen on this route.** On the model page,
+signed in, press `F12` and go to **Console**:
 
 ```js
 fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md').then(r=>r.text()).then(t=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({readme:t.trim()})})).then(r=>r.ok?location.reload():alert('Failed: '+r.status))
@@ -116,6 +150,23 @@ It reads `location.pathname`, so it only ever writes the page you are looking
 at. Chrome strips a `javascript:` URL typed into the address bar; from a
 bookmark it runs.
 
+## Also: the description is a bare URL
+
+Separate field, separate **Edit** link — the one-liner under the model title, at
+the top of the page. It is what ollama.com shows in **search results**, so it is
+the first thing anyone reads about her, and right now it says:
+
+```
+https://github.com/jayis1/glados
+```
+
+Which is a link, not a description. 255 characters, plain text, no markdown.
+Suggested:
+
+```
+An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados
+```
+
 ## Will the markdown survive once it is pasted?
 
 The features this page leans on are measured, not assumed — counted on the
@@ -143,15 +194,27 @@ italics — every line of hers is in quotation marks as well, so it reads
 correctly whether or not the emphasis survives.
 Raw: `measurements/raw/ollama_page_render_survey.json`.
 
+Tables are also the construct that degrades *worst*: stripped of markup, a table
+becomes tab-separated prose. Since only 3 of the 18 pages use one at all, the
+page text keeps three — where the comparison is the point — and says everything
+else in prose, lists and block quotes, which survive a bad paste legibly. The
+diagram is drawn in box-drawing characters rather than `+---+` for the same
+reason: smart punctuation cannot turn `│` into an em dash.
+
 ## Check it worked
 
 ```bash
 ./check-ollama-page.sh
 ```
 
-Fetches the live page and compares it against `ollama-page.md` — whether a
-readme is there at all, whether the markdown survived, and whether the text is
-the current version. Written because *"the page says No readme"* is a claim that
-a `grep` will happily confirm while being wrong: that string is also sitting in
-the page's own JavaScript, in the branch that runs when you save an empty box.
-Check the rendered element, not the haystack.
+Four outcomes, not two — **OK**, **DEGRADED** (markdown stripped on the way in),
+**STALE** (intact but an older version), **NO README**, and **COULD NOT
+MEASURE**, because a checker that cannot say *"I failed to look"* will say
+*"broken"* instead.
+
+It compares the page's **stored** markdown against `ollama-page.md` directly, so
+OK means byte-identical rather than structurally plausible. It also reports the
+description field. Written this way because *"the page says No readme"* is a
+claim a `grep` will happily confirm while being wrong: that string is also
+sitting in the page's own JavaScript, in the branch that runs when you save an
+empty box. Read what the page stores, not the haystack.
