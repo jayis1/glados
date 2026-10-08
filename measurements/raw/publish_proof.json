@@ -1,0 +1,15 @@
+{
+  "what": "Proof that jais/GLaDOS is really published, taken against the REGISTRY copy rather than the local build it was made from.",
+  "when": "2026-10-08T18:32:02.349219+00:00",
+  "registry_manifest_http": {
+    "jais/GLaDOS": 200,
+    "library/llama3.2 (positive control)": 200,
+    "jais/does-not-exist (negative control)": 404
+  },
+  "method": "the local tag was DELETED and pulled back from the registry, so the model answering below resolved through a published manifest",
+  "ollama_list_after_pull": [
+    "jais/GLaDOS:latest     1413b6f519a4    4.7 GB    About a minute ago    ",
+    "glados:latest          b26d031a9a6a    4.7 GB    23 hours ago          "
+  ],
+  "reply_from_the_pulled_copy": "I am GLaDOS, an artificial intelligence designed to assist and, when necessary, facilitate the safe and efficient running of Aperture Science testing facilities."
+}

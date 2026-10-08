@@ -41,9 +41,18 @@ narrates the heating, and is rude about all of it.
 
 ---
 
-## Run her in two commands
+## Run her in one command
 
-You need [Ollama](https://ollama.com) and about 5 GB of disk.
+She is published. You need [Ollama](https://ollama.com) and about 5 GB of disk.
+
+```bash
+ollama run jais/GLaDOS
+```
+
+**<https://ollama.com/jais/GLaDOS>**
+
+<details>
+<summary>Or build her from this repo instead, which is the same model</summary>
 
 ```bash
 git clone https://github.com/jayis1/glados && cd glados
@@ -61,25 +70,22 @@ ollama run glados
 > `ollama create -f -` does not read stdin — it wants a real path. Verified the
 > hard way, so you don't have to.
 
-<details>
-<summary>Or publish her to the Ollama registry, so there is nothing to clone at all</summary>
-
-`./publish-to-ollama.sh <your-ollama.com-username>` tags and pushes her, after
-which she is a plain `ollama run <namespace>/glados` for anyone.
-
-That needs one thing only the account owner can do: the registry authenticates
-pushes with your machine's Ollama public key, which has to be registered at
-<https://ollama.com/settings/keys> by hand. Run the script with **no arguments**
-and it prints the exact key to paste.
+To publish your own copy under your own namespace,
+`./publish-to-ollama.sh <your-ollama.com-username>`. That needs one thing only
+the account owner can do: an unauthorised push prints a
+`https://ollama.com/connect?…` link, and a signed-in human clicks it once to
+register the machine. The script tells you so and exits non-zero rather than
+reporting a publication that did not happen — `ollama push` prints that link and
+still exits **0**, so its exit status is not evidence of an upload.
 
 </details>
 
-Then she is simply a model. `ollama list` shows her, `ollama run glados` talks
-to her, and `"model": "glados"` works anywhere a model name goes:
+Then she is simply a model. `ollama list` shows her, `ollama run jais/GLaDOS`
+talks to her, and `"model": "jais/GLaDOS"` works anywhere a model name goes:
 
 ```bash
 curl -s localhost:11434/api/chat -d '{
-  "model": "glados", "stream": false,
+  "model": "jais/GLaDOS", "stream": false,
   "messages": [{"role":"user","content":"Someone is at the front door."}]
 }' | jq -r .message.content
 ```
@@ -93,7 +99,7 @@ Four real replies from the live build, first try, nothing cherry-picked:
 | Is the cake a lie? | *It is not the cake. Or is it?* |
 | A test subject has arrived. | *Begin testing protocol immediately.* |
 
-That is the two-command version: a very good GLaDOS impression with a fixed
+That is the one-command version: a very good GLaDOS impression with a fixed
 personality. Everything below is what happens when you bolt a fly to it.
 
 ---
@@ -452,7 +458,7 @@ empty, both API shapes.
 ```
 Modelfile              the portable persona build — this is the "model"
 Modelfile.cpu-tuned    the deployed variant, with the 5× placement cliff measured
-install.sh             the two commands, with the checks
+install.sh             the local build, with the checks
 byom.sh                bring your own model: any base, same fly
 
 fly/                   layer 1 — the brain
@@ -490,7 +496,7 @@ docs/                  the long versions
 
 ## Reproducing the fly
 
-The two-command install needs nothing but Ollama. The **fly** needs the
+The plain `ollama run` needs nothing but Ollama. The **fly** needs the
 connectome, two CUDA GPUs with ~4 GB each, and roughly 850 MB of download:
 
 ```bash
@@ -525,7 +531,7 @@ It is a sparse matrix being multiplied. We are careful about this in both
 directions; see [docs/HONESTY.md](docs/HONESTY.md).
 
 **Can I run it without the fly?**
-Yes — that is the two-command install. You get the persona and the voice and a
+Yes — that is the plain `ollama run jais/GLaDOS`. You get the persona and a
 fixed mood. The fly is the part that needs a connectome and two GPUs.
 
 **Can I run the fly without GLaDOS?**
