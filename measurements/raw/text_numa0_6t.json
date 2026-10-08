@@ -1,0 +1,25 @@
+{
+  "label": "numa0-6t",
+  "num_gpu": 0,
+  "num_thread": 6,
+  "decode_tok_s_median": 7.12,
+  "wall_ms_median": 2660.5,
+  "reps": [
+    {
+      "wall_ms": 1833.8,
+      "eval_count": 12,
+      "decode_tok_s": 7.24,
+      "prompt_tok_s": 418.4,
+      "load_ms": 2.8,
+      "reply": "Security protocol dictates you should have arrived two hours earlier."
+    },
+    {
+      "wall_ms": 3487.2,
+      "eval_count": 15,
+      "decode_tok_s": 6.99,
+      "prompt_tok_s": 48.7,
+      "load_ms": 3.0,
+      "reply": "You must be hallucinating; I control the testing chamber's environment."
+    }
+  ]
+}

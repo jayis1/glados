@@ -1,0 +1,25 @@
+{
+  "label": "numa0-8t",
+  "num_gpu": 0,
+  "num_thread": 8,
+  "decode_tok_s_median": 8.15,
+  "wall_ms_median": 2295.2,
+  "reps": [
+    {
+      "wall_ms": 1518.9,
+      "eval_count": 11,
+      "decode_tok_s": 8.04,
+      "prompt_tok_s": 496.0,
+      "load_ms": 4.0,
+      "reply": "And? Celebrating an achievement in punctuality?"
+    },
+    {
+      "wall_ms": 3071.4,
+      "eval_count": 17,
+      "decode_tok_s": 8.27,
+      "prompt_tok_s": 64.5,
+      "load_ms": 4.0,
+      "reply": "Curious timing. I wonder who or what could possibly breach my containment protocols."
+    }
+  ]
+}

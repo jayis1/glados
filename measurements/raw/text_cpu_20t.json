@@ -1,0 +1,25 @@
+{
+  "label": "cpu-20t",
+  "num_gpu": 0,
+  "num_thread": 20,
+  "decode_tok_s_median": 1.54,
+  "wall_ms_median": 13785.6,
+  "reps": [
+    {
+      "wall_ms": 13022.9,
+      "eval_count": 20,
+      "decode_tok_s": 1.71,
+      "prompt_tok_s": 54.3,
+      "load_ms": 4.6,
+      "reply": "Welcome back, late sleeper. Now, get those dreams ready; it's time for testing."
+    },
+    {
+      "wall_ms": 14548.3,
+      "eval_count": 16,
+      "decode_tok_s": 1.36,
+      "prompt_tok_s": 23.5,
+      "load_ms": 5.9,
+      "reply": "Why, Doctor, I haven't seen you in a portal or two."
+    }
+  ]
+}

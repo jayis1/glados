@@ -1,0 +1,34 @@
+{
+  "label": "t400x2-long",
+  "long_prompt": true,
+  "num_gpu": 99,
+  "num_thread": null,
+  "decode_tok_s_median": 7.06,
+  "wall_ms_median": 17160.3,
+  "reps": [
+    {
+      "wall_ms": 17160.3,
+      "eval_count": 120,
+      "decode_tok_s": 7.06,
+      "prompt_tok_s": 473.1,
+      "load_ms": 4.2,
+      "reply": "1. Ignoring firmware updates because \"nothing ever goes wrong.\"\n2. Using the same password for everything, because \"simpler is better.\"\n3. Buying the cheapest hardware available, because \"you get what you pay for.\"\n4. Failing to document, because \"it'll be easy to remember.\"\n5. Installing critical software without testing, because \"it looks harmless.\"\n6. Underestimating the need for backups, because \"it's never happened before.\"\n7. Believing you're too smart to make mistakes, because \"I'm GLaDOS, and I never err"
+    },
+    {
+      "wall_ms": 17184.3,
+      "eval_count": 120,
+      "decode_tok_s": 7.05,
+      "prompt_tok_s": 472.3,
+      "load_ms": 3.1,
+      "reply": "1. Failing to document your setup\u2014because why would anyone need to know how you do it?\n2. Ignoring updates\u2014because fresh pain doesn't matter if it's not yours.\n3. Overcomplicating the configuration\u2014because more complexity means more blame.\n4. Underestimating security\u2014because why would you want intruders peeking at your cat videos?\n5. Mislabeling network cables\u2014because nobody gets fired for buying too many patch cords.\n6. Not having a backup strategy\u2014because losing data is just part of the adventure.\n7. Believing in magic"
+    },
+    {
+      "wall_ms": 14584.0,
+      "eval_count": 102,
+      "decode_tok_s": 7.07,
+      "prompt_tok_s": 464.6,
+      "load_ms": 3.7,
+      "reply": "1. Lack of documentation\u2014because who has time to write things down?\n2. Overconfidence in your setup\u2014until the inevitable fails.\n3. Ignoring security updates\u2014until you wish you hadn't.\n4. Not testing backups\u2014until you need them.\n5. Using default passwords\u2014because \"admin\" is just so obvious.\n6. Buying the cheapest hardware\u2014until you can't afford the downtime.\n7. Not having a plan B\u2014because when things go south, they go fast."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "label": "cpu-10t",
+  "num_gpu": 0,
+  "num_thread": 10,
+  "decode_tok_s_median": 8.18,
+  "wall_ms_median": 2615.8,
+  "reps": [
+    {
+      "wall_ms": 1598.7,
+      "eval_count": 12,
+      "decode_tok_s": 8.24,
+      "prompt_tok_s": 530.0,
+      "load_ms": 3.9,
+      "reply": "And? Celebrating with a cake and a show?"
+    },
+    {
+      "wall_ms": 3632.9,
+      "eval_count": 22,
+      "decode_tok_s": 8.11,
+      "prompt_tok_s": 71.1,
+      "load_ms": 3.7,
+      "reply": "Oh, what a delightful surprise. I hope you brought something interesting; the last visitor was rather dull."
+    }
+  ]
+}

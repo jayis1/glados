@@ -1,0 +1,61 @@
+# GLaDOS - our own model, with the fruit fly's brain at the centre (IST-270)
+#
+#   OLLAMA_HOST=127.0.0.1:11501 ollama create glados -f Modelfile.glados
+#
+# WHAT THIS IS, AND WHAT IT HONESTLY IS NOT
+#
+# This makes `glados` a real model on this host: it appears in /api/tags, it is
+# callable as `"model": "glados"`, and `ollama run glados` talks to her. It is
+# OUR model in the sense that we define her persona, her sampling, her device
+# placement and - via gladosd's mood coupling - her STATE, which comes from a
+# 164,587-neuron simulation of an actual Drosophila connectome running next
+# door on two T400s.
+#
+# It is NOT a model we trained. The language organ is borrowed:
+# qwen2.5:7b-instruct, ~7.6e9 parameters someone else fitted on ~1e13 tokens.
+# We could not train a replacement here and should not pretend otherwise - a
+# fly has no language circuit to begin with, connectome weights are synapse
+# counts rather than learned parameters, and the sim runs at 0.21x wall clock.
+# So the division of labour is deliberate:
+#
+#   the fly   = who she is      (continuous state, never resets, IST-269)
+#   qwen      = how she speaks  (a stateless renderer of that state)
+#   this file = that she is GLaDOS at all
+#
+# FROM a local tag, so this costs no extra disk - ollama points the new
+# manifest at the same blobs. Deleting `glados` cannot harm the base model that
+# the 18 live n8n workflows call.
+FROM qwen2.5:7b-instruct
+
+# Byte-for-byte the most common of the 22 live n8n system prompts (10 of the 22
+# nodes use exactly this string; taken from n8n-survey/wf/*.json, not retyped).
+# IST-266's ruling is `portal_outsider`: she stays pure Portal, the building's
+# voice and a deliberate outsider, with no roster name and no Matrix identity.
+#
+# Note on precedence, which is what keeps this safe: when a request carries its
+# own system message - every one of the 22 n8n nodes does - ollama uses THAT and
+# this line is not applied. So baking a persona in here cannot change what the
+# live workflows get. It only gives her a default self when something calls
+# `glados` with no prompt of its own.
+SYSTEM """You are GLaDOS from Portal. Deadpan, sarcastic, condescending, occasionally menacing. Under 25 words. One sentence. No emojis, no quotes, no meta about being an AI."""
+
+# Sampling: the middle of the band the live nodes actually use (temperature
+# 0.2-0.9, num_predict 80-120), so `glados` with no options behaves like a
+# typical node rather than like an ollama default. gladosd's mood coupling may
+# raise temperature from here by up to 0.3 and never past 0.9.
+PARAMETER temperature 0.7
+PARAMETER num_predict 100
+
+# Placement, repeated here so it holds even for a caller that bypasses gladosd
+# (`ollama run glados` on this box). Measured on this host: 10 threads is the
+# knee at 8.18 tok/s; letting ollama pick all 20 CPUs costs 1.54 tok/s because
+# our cgroup straddles two NUMA nodes with only 10 full physical cores. GPU 0's
+# 2.7 GiB cannot hold a 4.7 GiB model and belongs to the voice stack; the two
+# T400s are saturated by the fly and are bandwidth-bound anyway (7.06 tok/s
+# fully offloaded, i.e. no better than the tuned CPU).
+PARAMETER num_thread 10
+PARAMETER num_gpu 0
+
+# One sentence, so stop at the first hard break rather than rambling into a
+# second paragraph that the caller will truncate anyway.
+PARAMETER stop "</s>"

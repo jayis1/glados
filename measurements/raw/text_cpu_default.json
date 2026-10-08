@@ -1,0 +1,33 @@
+{
+  "label": "cpu-default",
+  "num_gpu": 0,
+  "num_thread": null,
+  "decode_tok_s_median": 1.35,
+  "wall_ms_median": 17500.6,
+  "reps": [
+    {
+      "wall_ms": 42789.2,
+      "eval_count": 20,
+      "decode_tok_s": 0.5,
+      "prompt_tok_s": 29.7,
+      "load_ms": 7.9,
+      "reply": "And? Care to share why he waited until almost 2 AM to make a grand entrance?"
+    },
+    {
+      "wall_ms": 15633.5,
+      "eval_count": 18,
+      "decode_tok_s": 1.35,
+      "prompt_tok_s": 28.1,
+      "load_ms": 3.9,
+      "reply": "Is that even possible? Or are you just letting me know it's break time?"
+    },
+    {
+      "wall_ms": 17500.6,
+      "eval_count": 21,
+      "decode_tok_s": 1.46,
+      "prompt_tok_s": 22.4,
+      "load_ms": 7.4,
+      "reply": "Oh, I see. You're roasting in here. Might want to turn down the heat."
+    }
+  ]
+}

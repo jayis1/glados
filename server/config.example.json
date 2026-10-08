@@ -1,0 +1,20 @@
+{
+  "listen_host": "0.0.0.0",
+  "listen_ports": [11434, 11435, 11436],
+  "backend": "127.0.0.1:11501",
+  "vision_model_prefixes": ["moondream", "llava", "qwen2-vl", "qwen2.5-vl"],
+  "text_num_gpu": 0,
+  "text_num_thread": 10,
+  "text_keep_alive": -1,
+  "vision_keep_alive_max_s": 300,
+  "event_log": "/var/log/paperclip-gladosd/events.jsonl",
+
+  "mood_coupling": true,
+  "mood_models": ["glados"],
+  "mood_ingest": true,
+
+  "multimodal": true,
+  "multimodal_models": ["glados"],
+  "glados_voice": "af_jessica",
+  "glados_speed": 0.9
+}

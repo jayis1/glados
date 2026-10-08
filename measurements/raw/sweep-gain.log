@@ -1,0 +1,16 @@
+refractory ceiling 333 Hz   reference stimulus olfactory_ORN=0.1
+
+   inh   gain   bias  sigma     p0     net   net+   central_c kenyon_ce      MBON       DAN escape_GF  spread    resp  verdict
+ 1.553   0.40  0.025  0.060 0.0100    1.08   2.87        1.19      0.51      0.64      0.57      1.03    0.35    0.09  ok
+ 1.553   1.00  0.025  0.060 0.0100    1.59   3.98        1.64      0.16      0.26      0.23      1.91    0.92    0.68  ok
+ 1.553   2.00  0.025  0.060 0.0100    3.48   9.49        2.79      0.02      0.13      0.06      2.79    1.15   38.75  ok
+ 1.553   4.00  0.025  0.060 0.0100   15.52  20.73        5.73    128.06     94.33    159.69      3.97    0.81   77.16  PINNED:keny,DAN
+ 1.553   8.00  0.025  0.060 0.0100   26.13  26.42       21.30    333.34    316.93    322.78     15.81    0.74    0.56  PINNED:keny,MBON,DAN
+ 1.553  16.00  0.025  0.060 0.0100   29.65  32.50       34.22    305.40    273.53    323.05     57.50    0.63   17.27  PINNED:keny,MBON,DAN
+ 1.553  32.00  0.025  0.060 0.0100   36.97  37.89       45.52    304.12    276.24    325.12     58.38    0.61   18.08  PINNED:keny,MBON,DAN
+
+3 usable operating points
+  inh=1.553 gain=2.0 bias=0.025 sigma=0.06 p0=0.01  net 3.48 Hz  spread 1.15  response 38.75 Hz
+  inh=1.553 gain=1.0 bias=0.025 sigma=0.06 p0=0.01  net 1.59 Hz  spread 0.92  response 0.68 Hz
+  inh=1.553 gain=0.4 bias=0.025 sigma=0.06 p0=0.01  net 1.08 Hz  spread 0.35  response 0.09 Hz
+wrote measurements/sweep-gain.json

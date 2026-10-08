@@ -1,0 +1,10 @@
+T400s visible: (1, 2)
+GPU1           8.918 ms/step  [8.910-9.423]     112 steps/s   0.11x realtime   mean 1.00 Hz   exch local
+             GPU1 rows       0-164,587 nnz   24,539,704
+GPU2           8.889 ms/step  [8.880-9.239]     112 steps/s   0.11x realtime   mean 1.00 Hz   exch local
+             GPU2 rows       0-164,587 nnz   24,539,704
+GPU1+GPU2      4.575 ms/step  [4.552-5.457]     219 steps/s   0.22x realtime   mean 1.00 Hz   exch peer
+             GPU1 rows       0-53,047  nnz   12,269,945
+             GPU2 rows  53,047-164,587 nnz   12,269,759
+
+best 1-GPU 8.889 ms  ->  2-GPU 4.575 ms   speedup 1.94x   (ideal 2.00x; overhead 0.131 ms/step)

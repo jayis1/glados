@@ -1,0 +1,148 @@
+{
+  "capabilities": {
+    "model": "glados",
+    "service": "paperclip-gladosd",
+    "issue": "IST-270",
+    "one_model": true,
+    "honest_note": "One name and one API over five engines, not one set of weights - those architectures cannot be merged without training, which this host cannot do.",
+    "engines": [
+      {
+        "part": "state",
+        "engine": "drosophila connectome (164,587 neurons)",
+        "where": "127.0.0.1:9099",
+        "device": "2x T400",
+        "ours": true,
+        "enabled": true
+      },
+      {
+        "part": "words",
+        "engine": "qwen2.5:7b-instruct",
+        "where": "127.0.0.1:11501",
+        "device": "cpu/10 threads",
+        "ours": false,
+        "enabled": true
+      },
+      {
+        "part": "sight",
+        "engine": "moondream",
+        "where": "127.0.0.1:11501",
+        "device": "gpu0",
+        "ours": false,
+        "enabled": true
+      },
+      {
+        "part": "hearing",
+        "engine": "whisper large-v3",
+        "where": "127.0.0.1:9097",
+        "device": "gpu0",
+        "ours": false,
+        "enabled": true
+      },
+      {
+        "part": "voice",
+        "engine": "kokoro",
+        "where": "127.0.0.1:9098",
+        "device": "gpu0",
+        "ours": false,
+        "enabled": true,
+        "default_voice": "af_jessica"
+      }
+    ],
+    "request_extensions": {
+      "audio": "list of base64 RIFF/WAVE clips, top level (/api/generate) or on a message (/api/chat); replaced by its transcript before generation",
+      "images": "already standard; for `glados` they are captioned by moondream and folded in as text",
+      "speak": "true -> the reply is rendered and returned as `audio` (base64 WAV). Requires stream:false.",
+      "voice": "a Kokoro voice name; default af_jessica",
+      "speed": "0.5-2.0, default 0.9",
+      "language": "whisper language hint, default en"
+    },
+    "fenced_to": [
+      "glados"
+    ],
+    "not_fenced_in": "qwen2.5:7b-instruct - the tag the 22 live n8n nodes call keeps plain text behaviour",
+    "senses": {
+      "multimodal": true,
+      "models": [
+        "glados"
+      ],
+      "counters": {
+        "heard": 1,
+        "stt_errors": 0,
+        "seen": 2,
+        "vision_errors": 0,
+        "spoken": 1,
+        "tts_errors": 0
+      },
+      "sight": {
+        "engine": "moondream",
+        "backend": "127.0.0.1:11501"
+      },
+      "hearing": {
+        "backend": "127.0.0.1:9097",
+        "ok": true,
+        "engine": "large-v3",
+        "device": "cuda",
+        "probe_ms": 1
+      },
+      "voice": {
+        "backend": "127.0.0.1:9098",
+        "ok": true,
+        "engine": "kokoro",
+        "device": "cuda",
+        "probe_ms": 1,
+        "voice": "af_jessica"
+      }
+    }
+  },
+  "words": {
+    "status": 200,
+    "ms": 4279,
+    "reply": "Really? I wonder who could be here, or is it just the wind trying to persuade you of its existence?"
+  },
+  "sight": {
+    "status": 200,
+    "ms": 4577,
+    "reply": "Oh, joy. Another redundant pair here to be added to the cannon fodder count."
+  },
+  "hearing": {
+    "status": 200,
+    "ms": 6367,
+    "spoken_to_her": "Hello, is anyone home? I have a package for you.",
+    "reply": "Oh, a package, you say? How quaint. Bring it to the testing chamber, and we'll see what you've got."
+  },
+  "voice": {
+    "status": 200,
+    "ms": 4564,
+    "reply": "Welcome to the party, intruder. I hope you brought a good reason for disturbing my solitude.",
+    "audio_bytes": 260140,
+    "audio_ms": 5418,
+    "audio_voice": "af_jessica",
+    "audio_error": null
+  },
+  "all_senses_at_once": {
+    "status": 200,
+    "ms": 7252,
+    "reply": "Well, well, well. If it isn't a human with a pet. How utterly quaint.",
+    "audio_ms": 3520,
+    "audio_bytes": 169004,
+    "audio_error": null
+  },
+  "control_arm_qwen": {
+    "status": 200,
+    "ms": 3734,
+    "reply": "Well, well, well. You must have impressed someone greatly to have guests.",
+    "audio_present": false,
+    "audio_error": null
+  },
+  "stream_plus_speak": {
+    "status": 400,
+    "error": "speak requires stream:false - the spoken WAV is attached to the single response object, and an ndjson stream has nowhere to put it"
+  },
+  "summary": {
+    "passed": 20,
+    "failed": 0,
+    "at": "2026-10-07T19:39:09Z",
+    "host": "127.0.0.1:11434",
+    "failures": []
+  }
+}

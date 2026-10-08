@@ -1,0 +1,25 @@
+{
+  "label": "numa0-11t",
+  "num_gpu": 0,
+  "num_thread": 11,
+  "decode_tok_s_median": 8.52,
+  "wall_ms_median": 3128.9,
+  "reps": [
+    {
+      "wall_ms": 2863.8,
+      "eval_count": 21,
+      "decode_tok_s": 8.52,
+      "prompt_tok_s": 186.0,
+      "load_ms": 8.7,
+      "reply": "Oh, so your friend decided to grace us with his presence at such an ungodly hour."
+    },
+    {
+      "wall_ms": 3393.9,
+      "eval_count": 19,
+      "decode_tok_s": 8.53,
+      "prompt_tok_s": 56.7,
+      "load_ms": 15.0,
+      "reply": "Oh, you must be new here. I suggest you learn the proper way to interact."
+    }
+  ]
+}

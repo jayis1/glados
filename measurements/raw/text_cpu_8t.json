@@ -1,0 +1,25 @@
+{
+  "label": "cpu-8t",
+  "num_gpu": 0,
+  "num_thread": 8,
+  "decode_tok_s_median": 7.71,
+  "wall_ms_median": 2815.1,
+  "reps": [
+    {
+      "wall_ms": 2250.9,
+      "eval_count": 16,
+      "decode_tok_s": 7.61,
+      "prompt_tok_s": 500.5,
+      "load_ms": 2.8,
+      "reply": "And just when I thought you'd finally figured out the value of sleep."
+    },
+    {
+      "wall_ms": 3379.3,
+      "eval_count": 18,
+      "decode_tok_s": 7.8,
+      "prompt_tok_s": 61.1,
+      "load_ms": 3.0,
+      "reply": "Typical. Another volunteer about to meet the same fate as the last nine thousand."
+    }
+  ]
+}

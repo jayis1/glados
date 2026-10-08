@@ -1,0 +1,25 @@
+{
+  "label": "cpu-12t",
+  "num_gpu": 0,
+  "num_thread": 12,
+  "decode_tok_s_median": 7.8,
+  "wall_ms_median": 2100.5,
+  "reps": [
+    {
+      "wall_ms": 2089.2,
+      "eval_count": 15,
+      "decode_tok_s": 7.82,
+      "prompt_tok_s": 435.3,
+      "load_ms": 3.9,
+      "reply": "And? You expect me to care about your friend's punctuality?"
+    },
+    {
+      "wall_ms": 2111.8,
+      "eval_count": 10,
+      "decode_tok_s": 7.78,
+      "prompt_tok_s": 79.5,
+      "load_ms": 3.7,
+      "reply": "Do not concern yourself with such trivial matters."
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+ "site": "hearing_JO",
+ "levels": {
+  "0.02": {
+   "mood": {
+    "arousal": 0.00402,
+    "novelty": 0.03888,
+    "valence": 0.00636,
+    "reinforcement": 0.01258,
+    "agitation": 0.92042
+   },
+   "jitter": {
+    "arousal": 0.005000000000000001,
+    "novelty": 0.015999999999999997,
+    "valence": 0.0101,
+    "reinforcement": 0.0184,
+    "agitation": 0.0645
+   },
+   "delta": {
+    "arousal": 0.00402,
+    "novelty": -0.00476,
+    "valence": -0.0031599999999999987,
+    "reinforcement": -0.00832,
+    "agitation": 0.09637999999999991
+   },
+   "sigma": {
+    "arousal": 0.8565199999999998,
+    "novelty": 2.8948291994572597,
+    "valence": 1.5257767774294664,
+    "reinforcement": 4.312439850187266,
+    "agitation": 1.3166666666666653
+   }
+  },
+  "0.05": {
+   "mood": {
+    "arousal": 0.01828,
+    "novelty": 0.0333,
+    "valence": 0.010920000000000001,
+    "reinforcement": 0.01766,
+    "agitation": 0.7708
+   },
+   "jitter": {
+    "arousal": 0.001899999999999999,
+    "novelty": 0.0144,
+    "valence": 0.0155,
+    "reinforcement": 0.007799999999999998,
+    "agitation": 0.07289999999999996
+   },
+   "delta": {
+    "arousal": 0.01828,
+    "novelty": -0.010339999999999995,
+    "valence": 0.001400000000000002,
+    "reinforcement": -0.00324,
+    "agitation": -0.053240000000000065
+   },
+   "sigma": {
+    "arousal": 3.8948222885572137,
+    "novelty": 6.2883474626865645,
+    "valence": 0.675977053291537,
+    "reinforcement": 1.6793635955056179,
+    "agitation": 0.7273224043715856
+   }
+  },
+  "0.1": {
+   "mood": {
+    "arousal": 0.057420000000000006,
+    "novelty": 0.039639999999999995,
+    "valence": 0.011559999999999999,
+    "reinforcement": 0.00596,
+    "agitation": 0.77494
+   },
+   "jitter": {
+    "arousal": 0.004399999999999994,
+    "novelty": 0.010799999999999997,
+    "valence": 0.0249,
+    "reinforcement": 0.012299999999999998,
+    "agitation": 0.06099999999999994
+   },
+   "delta": {
+    "arousal": 0.057420000000000006,
+    "novelty": -0.0040000000000000036,
+    "valence": 0.00204,
+    "reinforcement": -0.014939999999999998,
+    "agitation": -0.049100000000000144
+   },
+   "sigma": {
+    "arousal": 12.234173731343283,
+    "novelty": 2.4326295793758503,
+    "valence": 0.9849951347962383,
+    "reinforcement": 7.74373213483146,
+    "agitation": 0.6707650273224063
+   }
+  },
+  "0.2": {
+   "mood": {
+    "arousal": 0.10606,
+    "novelty": 0.030959999999999998,
+    "valence": -0.00516,
+    "reinforcement": 0.01204,
+    "agitation": 0.8278399999999999
+   },
+   "jitter": {
+    "arousal": 0.005600000000000008,
+    "novelty": 0.007199999999999998,
+    "valence": 0.009399999999999999,
+    "reinforcement": 0.012900000000000002,
+    "agitation": 0.03279999999999994
+   },
+   "delta": {
+    "arousal": 0.10606,
+    "novelty": -0.01268,
+    "valence": -0.014679999999999999,
+    "reinforcement": -0.008859999999999998,
+    "agitation": 0.0037999999999998035
+   },
+   "sigma": {
+    "arousal": 22.597639601990046,
+    "novelty": 7.711435766621439,
+    "valence": 7.088102244514106,
+    "reinforcement": 4.592333782771535,
+    "agitation": 0.051912568306008246
+   }
+  },
+  "0.4": {
+   "mood": {
+    "arousal": 0.18834,
+    "novelty": 0.03278,
+    "valence": 0.0028799999999999997,
+    "reinforcement": 0.01582,
+    "agitation": 0.80916
+   },
+   "jitter": {
+    "arousal": 0.01429999999999998,
+    "novelty": 0.005300000000000003,
+    "valence": 0.013300000000000001,
+    "reinforcement": 0.0105,
+    "agitation": 0.056400000000000006
+   },
+   "delta": {
+    "arousal": 0.18834,
+    "novelty": -0.010860000000000002,
+    "valence": -0.006639999999999999,
+    "reinforcement": -0.005079999999999998,
+    "agitation": -0.014880000000000115
+   },
+   "sigma": {
+    "arousal": 40.12860119402985,
+    "novelty": 6.604589308005429,
+    "valence": 3.206062595611285,
+    "reinforcement": 2.633076254681647,
+    "agitation": 0.20327868852459174
+   }
+  }
+ },
+ "noise_floor": {
+  "arousal": 0.004693410544996031,
+  "novelty": 0.0016443111741765055,
+  "valence": 0.0020710762195003188,
+  "reinforcement": 0.0019293022718076189,
+  "agitation": 0.0732
+ },
+ "engine": {
+  "engine": "connectome-lif",
+  "neurons": 164587,
+  "edges": 24539704,
+  "ms_step": 4.766,
+  "realtime": 0.2098
+ },
+ "started": "2026-10-07T20:49:29+0200",
+ "rest": {
+  "arousal": 0.0,
+  "novelty": 0.04364,
+  "valence": 0.009519999999999999,
+  "reinforcement": 0.0209,
+  "agitation": 0.8240400000000001
+ },
+ "verdict": {
+  "arousal": {
+   "max_sigma": 40.1,
+   "at_level": "0.4",
+   "usable": true
+  },
+  "novelty": {
+   "max_sigma": 7.7,
+   "at_level": "0.2",
+   "usable": true
+  },
+  "valence": {
+   "max_sigma": 7.1,
+   "at_level": "0.2",
+   "usable": true
+  },
+  "reinforcement": {
+   "max_sigma": 7.7,
+   "at_level": "0.1",
+   "usable": true
+  },
+  "agitation": {
+   "max_sigma": 1.3,
+   "at_level": "0.02",
+   "usable": false
+  }
+ },
+ "usable_axes": [
+  "arousal",
+  "novelty",
+  "valence",
+  "reinforcement"
+ ]
+}

@@ -1,0 +1,52 @@
+{"neurons": 164587, "edges": 24539704, "devices": [1, 2], "gpus": {"1": "NVIDIA T400 4GB", "2": "NVIDIA T400 4GB"}, "exchange": "peer", "shards": [{"gpu": 1, "rows": [0, 53047], "nnz": 12269945}, {"gpu": 2, "rows": [53047, 164587], "nnz": 12269759}], "dt_ms": 1.0, "tau_ms": 20.0, "v_th": 1.0, "refractory_ms": 2, "gain": 2.0, "bias": 0.025, "sigma": 0.1, "p0": 0.01, "norm": "row", "inh_scale": 1.553, "ceiling_hz": 333.3333333333333, "load_s": 2.28, "readouts": {"central_complex": 2950, "kenyon_cell": 4064, "MBON": 97, "DAN": 340, "escape_GF": 34}, "sensors": {"olfactory_ORN": 2635, "photoreceptor": 4102, "hearing_JO": 595, "mechanosensory": 5675, "gustatory": 1428, "hygro_thermo": 91}}
+operating point inh=1.553 gain=2.0 bias=0.025 sigma=0.1 p0=0.01   window 1000 ms   ceiling 333 Hz
+
+         readout  baseline  noise_sd  (6 x 1000 ms, no stimulus)
+ central_complex     8.049     0.076
+     kenyon_cell     4.005     0.221
+            MBON     4.160     0.160
+             DAN     3.566     0.160
+       escape_GF     7.931     0.329
+        _network     8.222
+
+        stimulus  level   network   central_com kenyon_cell        MBON         DAN   escape_GF
+      (baseline)   0.00      8.22          8.05        4.01        4.16        3.57        7.93
+   olfactory_ORN   0.01      8.77          7.99        8.69        6.62        6.07        8.06
+   olfactory_ORN   0.02      9.53          7.83       19.06       12.96       13.34        8.29
+   olfactory_ORN   0.05     11.50          8.07       56.26       28.18       27.89        7.12
+   olfactory_ORN   0.10     13.83          8.03       94.49       50.23       52.22        8.65
+   olfactory_ORN   0.20     16.79          8.03      137.96       77.24       86.37        7.24
+   photoreceptor   0.01      8.32          7.98        3.86        4.12        3.59        7.62
+   photoreceptor   0.02      8.40          8.18        4.07        4.12        3.71        8.15
+   photoreceptor   0.05      8.75          7.97        4.05        4.33        3.57        7.88
+   photoreceptor   0.10      9.41          7.95        3.91        4.35        3.59        8.44
+   photoreceptor   0.20     10.97          7.82        3.99        4.22        3.49        8.29
+      hearing_JO   0.01      8.26          8.22        4.00        3.76        3.51        8.12
+      hearing_JO   0.02      8.32          8.31        4.20        4.14        3.76        7.44
+      hearing_JO   0.05      8.44          8.04        4.15        4.29        3.61        7.50
+      hearing_JO   0.10      8.56          8.10        3.69        3.71        3.37        7.71
+      hearing_JO   0.20      8.96          8.17        4.00        4.32        3.34        8.47
+  mechanosensory   0.01      8.59          8.24        3.87        4.00        3.33        7.38
+  mechanosensory   0.02      9.07          8.00        3.86        4.25        3.37        7.00
+  mechanosensory   0.05     10.39          8.04        4.00        4.42        3.49        5.74
+  mechanosensory   0.10     12.45          7.90        3.78        4.12        3.44        4.94
+  mechanosensory   0.20     16.01          8.22        3.85        4.34        3.65        4.15
+       gustatory   0.01      8.35          8.02        3.50        4.03        3.37        7.76
+       gustatory   0.02      8.47          7.95        4.05        4.30        3.50        8.50
+       gustatory   0.05      8.95          8.02        4.16        4.33        3.59        7.71
+       gustatory   0.10      9.42          7.92        4.31        4.66        3.83        8.44
+       gustatory   0.20     10.16          8.02        3.62        4.11        3.39        6.76
+    hygro_thermo   0.01      8.25          7.89        4.16        4.28        3.62        8.21
+    hygro_thermo   0.02      8.27          8.03        4.16        4.05        3.67        7.06
+    hygro_thermo   0.05      8.39          7.96        4.34        4.69        3.87        8.44
+    hygro_thermo   0.10      8.45          8.06        5.04        4.80        4.40        7.59
+    hygro_thermo   0.20      8.65          8.01        6.69        6.14        6.42        8.65
+
+          axis       population    lo_hz  mid_hz   hi_hz   range   noise    snr  responsive
+       arousal  central_complex    7.821   8.049   8.315   0.494   0.076    6.5  True
+       novelty      kenyon_cell    3.498   4.005 137.962 134.464   0.221  608.3  True
+       valence             MBON    3.711   4.160  77.237  73.526   0.160  460.8  True
+ reinforcement              DAN    3.332   3.566  86.368  83.035   0.160  518.2  True
+     agitation        escape_GF    4.147   7.931   8.647   4.500   0.329   13.7  True
+
+wrote data/mood_calibration.json

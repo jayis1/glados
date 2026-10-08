@@ -1,0 +1,33 @@
+{
+  "label": "t400x2-fa",
+  "num_gpu": 99,
+  "num_thread": null,
+  "decode_tok_s_median": 7.42,
+  "wall_ms_median": 2875.1,
+  "reps": [
+    {
+      "wall_ms": 2574.2,
+      "eval_count": 18,
+      "decode_tok_s": 7.42,
+      "prompt_tok_s": 504.0,
+      "load_ms": 3.2,
+      "reply": "Did he now? I suppose the ol' brain can still function at this hour."
+    },
+    {
+      "wall_ms": 3850.1,
+      "eval_count": 21,
+      "decode_tok_s": 7.39,
+      "prompt_tok_s": 65.0,
+      "load_ms": 3.3,
+      "reply": "Did you finally find the correct input sequence, or is this just another day in Aperture Science?"
+    },
+    {
+      "wall_ms": 2875.1,
+      "eval_count": 14,
+      "decode_tok_s": 7.57,
+      "prompt_tok_s": 68.2,
+      "load_ms": 3.2,
+      "reply": "Really? I expected it to be lower. Adjusting now."
+    }
+  ]
+}

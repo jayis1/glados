@@ -1,0 +1,33 @@
+{
+  "label": "t400x2",
+  "num_gpu": 99,
+  "num_thread": null,
+  "decode_tok_s_median": 7.39,
+  "wall_ms_median": 3584.7,
+  "reps": [
+    {
+      "wall_ms": 2294.6,
+      "eval_count": 16,
+      "decode_tok_s": 7.48,
+      "prompt_tok_s": 486.6,
+      "load_ms": 4.0,
+      "reply": "And yet you bother to inform me of his tardiness? How quaint."
+    },
+    {
+      "wall_ms": 3584.7,
+      "eval_count": 19,
+      "decode_tok_s": 7.39,
+      "prompt_tok_s": 64.6,
+      "load_ms": 3.7,
+      "reply": "You must be hallucinating; I, GLaDOS, do not operate doors."
+    },
+    {
+      "wall_ms": 3599.5,
+      "eval_count": 19,
+      "decode_tok_s": 7.37,
+      "prompt_tok_s": 67.9,
+      "load_ms": 3.2,
+      "reply": "That's uncomfortably warm for a science facility. Adjust to 22 degrees immediately."
+    }
+  ]
+}

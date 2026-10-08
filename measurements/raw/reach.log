@@ -1,0 +1,23 @@
+share of a readout's input weight traceable to each sensory population, per hop (3 hops)
+
+        stimulus  hop   central_comp  kenyon_cell         MBON          DAN    escape_GF
+   olfactory_ORN    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.000e+00
+   olfactory_ORN    2      2.255e-04    1.064e-01    1.163e-03    1.493e-03    0.000e+00
+   olfactory_ORN    3      1.396e-03    1.434e-01    6.984e-02    7.111e-02    1.088e-04
+   photoreceptor    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.000e+00
+   photoreceptor    2      7.002e-06    1.884e-04    9.642e-08    8.206e-07    0.000e+00
+   photoreceptor    3      2.416e-04    4.088e-04    1.684e-04    2.210e-04    5.479e-06
+      hearing_JO    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.000e+00
+      hearing_JO    2      7.570e-05    4.192e-07    8.645e-05    2.247e-05    8.865e-04
+      hearing_JO    3      3.200e-04    1.079e-04    1.887e-04    1.399e-04    2.376e-03
+  mechanosensory    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    3.121e-03
+  mechanosensory    2      1.399e-04    3.227e-06    2.786e-04    5.720e-05    6.476e-02
+  mechanosensory    3      7.107e-04    1.814e-04    8.851e-04    6.144e-04    9.371e-02
+       gustatory    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.000e+00
+       gustatory    2      1.010e-05    8.102e-05    5.683e-04    7.460e-04    1.900e-03
+       gustatory    3      1.524e-04    1.907e-04    1.358e-03    2.419e-03    6.867e-03
+    hygro_thermo    1      0.000e+00    0.000e+00    0.000e+00    0.000e+00    0.000e+00
+    hygro_thermo    2      3.765e-05    2.555e-03    5.991e-05    2.014e-04    4.892e-09
+    hygro_thermo    3      2.398e-04    4.320e-03    2.535e-03    2.709e-03    4.718e-05
+
+0 means the stimulus has no path of that length into the population at all.

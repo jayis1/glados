@@ -1,0 +1,25 @@
+{
+  "label": "cpu-4t",
+  "num_gpu": 0,
+  "num_thread": 4,
+  "decode_tok_s_median": 3.88,
+  "wall_ms_median": 6038.3,
+  "reps": [
+    {
+      "wall_ms": 5388.2,
+      "eval_count": 20,
+      "decode_tok_s": 3.88,
+      "prompt_tok_s": 311.1,
+      "load_ms": 2.9,
+      "reply": "02:14, huh? I suppose he's missed his nightly dose of boring."
+    },
+    {
+      "wall_ms": 6688.4,
+      "eval_count": 18,
+      "decode_tok_s": 3.89,
+      "prompt_tok_s": 31.7,
+      "load_ms": 2.8,
+      "reply": "That's rather unexpected. Care to explain why you're disobeying my instructions?"
+    }
+  ]
+}

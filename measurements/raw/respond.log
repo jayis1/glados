@@ -1,0 +1,31 @@
+{"neurons": 164587, "edges": 24539704, "devices": [1, 2], "gpus": {"1": "NVIDIA T400 4GB", "2": "NVIDIA T400 4GB"}, "exchange": "peer", "shards": [{"gpu": 1, "rows": [0, 53047], "nnz": 12269945}, {"gpu": 2, "rows": [53047, 164587], "nnz": 12269759}], "dt_ms": 1.0, "tau_ms": 20.0, "v_th": 1.0, "refractory_ms": 2, "gain": 0.4, "bias": 0.025, "sigma": 0.06, "p0": 0.01, "norm": "row", "inh_scale": 1.553, "ceiling_hz": 333.3333333333333, "load_s": 2.28, "readouts": {"central_complex": 2950, "kenyon_cell": 4064, "MBON": 97, "DAN": 340, "escape_GF": 34}, "sensors": {"olfactory_ORN": 2635, "photoreceptor": 4102, "hearing_JO": 595, "mechanosensory": 5675, "gustatory": 1428, "hygro_thermo": 91}}
+operating point inh=1.553 gain=0.4 bias=0.025 sigma=0.06 p0=0.01  ceiling 333 Hz
+
+        stimulus  level   network   central_com kenyon_cell        MBON         DAN   escape_GF
+      (baseline)   0.00      1.08          1.19        0.51        0.64        0.57        1.03
+   olfactory_ORN   0.01      1.17          1.20        0.52        0.44        0.46        1.03
+   olfactory_ORN   0.02      1.34          1.19        0.49        0.57        0.43        1.40
+   olfactory_ORN   0.05      1.93          1.16        0.58        0.54        0.49        1.18
+   olfactory_ORN   0.10      2.86          1.20        0.68        0.54        0.57        1.10
+   photoreceptor   0.01      1.20          1.14        0.49        0.93        0.46        1.69
+   photoreceptor   0.02      1.41          1.19        0.47        0.64        0.43        0.51
+   photoreceptor   0.05      2.10          1.19        0.50        0.67        0.45        0.81
+   photoreceptor   0.10      3.21          1.17        0.52        0.46        0.48        1.18
+      hearing_JO   0.01      1.10          1.16        0.52        0.72        0.51        0.96
+      hearing_JO   0.02      1.13          1.13        0.49        0.49        0.54        1.03
+      hearing_JO   0.05      1.26          1.15        0.49        0.57        0.48        1.03
+      hearing_JO   0.10      1.45          1.25        0.52        0.39        0.60        1.40
+  mechanosensory   0.01      1.30          1.15        0.54        0.52        0.51        1.03
+  mechanosensory   0.02      1.68          1.14        0.48        0.46        0.49        1.18
+  mechanosensory   0.05      2.91          1.15        0.49        0.62        0.59        1.18
+  mechanosensory   0.10      4.82          1.14        0.51        0.62        0.48        0.88
+       gustatory   0.01      1.13          1.17        0.51        0.85        0.54        0.88
+       gustatory   0.02      1.23          1.17        0.50        0.52        0.58        1.03
+       gustatory   0.05      1.56          1.19        0.47        0.57        0.46        1.18
+       gustatory   0.10      2.05          1.18        0.49        0.49        0.58        1.40
+    hygro_thermo   0.01      1.08          1.15        0.47        0.57        0.73        1.18
+    hygro_thermo   0.02      1.09          1.15        0.47        0.95        0.51        1.10
+    hygro_thermo   0.05      1.09          1.21        0.50        0.67        0.51        1.18
+    hygro_thermo   0.10      1.14          1.18        0.48        0.75        0.48        1.18
+
+wrote measurements/respond.json

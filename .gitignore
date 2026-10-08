@@ -1,0 +1,16 @@
+# The connectome and everything derived from it: ~850 MB, CC-BY, and fetched
+# by fly/fetch_connectome.sh rather than redistributed.
+fly/data/
+*.feather
+*.npz
+*.npy
+
+# Local runtime
+venv/
+__pycache__/
+*.pyc
+token
+secrets/
+config.json
+*.env
+*.wav

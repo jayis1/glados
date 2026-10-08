@@ -1,0 +1,44 @@
+probing http://127.0.0.1:9099
+
+1. health
+  [PASS] /health reports ok  after 0.0s
+  [PASS] engine named  connectome-lif
+  [PASS] both T400s in use  {'1': 'NVIDIA T400 4GB', '2': 'NVIDIA T400 4GB'}
+  [PASS] graph loaded  164587 neurons / 24539704 edges
+  [PASS] peer exchange  peer
+  [PASS] not saturated
+  [PASS] not silent  network 8.131 Hz
+       ms/step 4.764  realtime 0.2099x  axes ['arousal', 'novelty', 'valence', 'reinforcement', 'agitation']
+
+2. does the vector move?
+  [PASS] baseline read  http 200
+       rest   {"arousal": 0.0001, "novelty": 0.0421, "valence": -0.0006, "reinforcement": 0.0255, "agitation": 0.8891}
+  [PASS] second baseline read  http 200
+       rest   {"arousal": 0.001, "novelty": 0.0437, "valence": 0.0057, "reinforcement": 0.0255, "agitation": 0.8256}
+       rest-to-rest jitter {"arousal": 0.001, "novelty": 0.002, "valence": 0.006, "reinforcement": 0.0, "agitation": 0.064}  -> return tolerance 0.191
+  [PASS] read under olfactory_ORN=0.05  http 200
+  [PASS] olfactory_ORN=0.05 moves the vector  delta {"novelty": 0.662, "valence": 0.5955, "reinforcement": 0.5739}
+         olfactory_ORN=0.05  {"arousal": 0.3941, "novelty": 0.7041, "valence": 0.5949, "reinforcement": 0.5994, "agitation": 0.8472}
+  [PASS] read under olfactory_ORN=0.20  http 200
+  [PASS] olfactory_ORN=0.20 moves the vector  delta {"valence": 0.9596, "reinforcement": 0.9359, "novelty": 0.9278}
+         olfactory_ORN=0.20  {"arousal": 0.9232, "novelty": 0.9699, "valence": 0.959, "reinforcement": 0.9614, "agitation": 0.88}
+  [PASS] read under mechanosensory=0.20  http 200
+  [PASS] mechanosensory=0.20 moves the vector  delta {"arousal": 0.9327, "agitation": -0.6557, "novelty": 0.465}
+        mechanosensory=0.20  {"arousal": 0.9328, "novelty": 0.5071, "valence": 0.4215, "reinforcement": 0.4597, "agitation": 0.2334}
+  [PASS] returns to rest when the stimulus stops  max axis drift 0.069 (agitation) vs tolerance 0.191
+  [PASS] at least two axes respond  ['agitation', 'arousal', 'novelty', 'reinforcement', 'valence']
+
+3. restart
+  [PASS] healthy again after restart  in 6.0s
+  [PASS] it is a new process (step counter restarted)  26400 -> 600
+  [PASS] /mood serves after restart  {"arousal": 0.0, "novelty": 0.0235, "valence": 0.0164, "reinforcement": 0.0339, "agitation": 0.72}
+
+4. auth and input validation
+  [PASS] /mood without a token is 401  http 401
+  [PASS] /mood with a wrong token is 401  http 401
+  [PASS] /health without a token is 200  http 200
+  [PASS] unknown population is rejected  http 400 {'error': 'unknown_population', 'name': 'nose', 'known': ['olfactory_ORN', 'photoreceptor', 'hearing_JO', 'mechanosensory', 'gustatory', 'hygro_thermo']}
+  [PASS] out-of-range level is rejected  http 400
+  [PASS] drive reset accepted
+
+all checks passed

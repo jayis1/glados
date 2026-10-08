@@ -1,0 +1,25 @@
+{
+  "label": "cpu-6t",
+  "num_gpu": 0,
+  "num_thread": 6,
+  "decode_tok_s_median": 5.93,
+  "wall_ms_median": 3919.2,
+  "reps": [
+    {
+      "wall_ms": 3207.0,
+      "eval_count": 18,
+      "decode_tok_s": 5.94,
+      "prompt_tok_s": 424.3,
+      "load_ms": 3.1,
+      "reply": "Wonderful, Jay's punctuality is now rivaling a sloth on speed."
+    },
+    {
+      "wall_ms": 4631.5,
+      "eval_count": 19,
+      "decode_tok_s": 5.91,
+      "prompt_tok_s": 46.2,
+      "load_ms": 3.1,
+      "reply": "Oh, must be another test subject. Let's see how you fare, shall we?"
+    }
+  ]
+}
