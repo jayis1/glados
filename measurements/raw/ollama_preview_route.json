@@ -1,0 +1,10 @@
+{
+  "body": "the raw markdown, as the page's own preview() sends it",
+  "body_bytes": 12980,
+  "body_head": "Unauthorized (ref: a68464eb-0a76-4218-9778-4680444f85cf)\n",
+  "conclusion": "cookie-gated, like the write route",
+  "measured_at": "2026-10-08T20:14:03Z",
+  "route": "POST https://ollama.com/jais/GLaDOS/preview",
+  "status": 401,
+  "why": "The model page's Edit box has a Preview tab. If its render route were open, the exact rendering could be verified before pasting. It is not."
+}
