@@ -114,7 +114,8 @@ HA_BASE = start_fake_ha()
 DEAF = deaf_listener()
 CLOSED = closed_port()
 
-TOUCH = ["binary_sensor.front_door_visitor", "binary_sensor.front_door_person"]
+# Arbitrary names: these go to the fake HA below, not to anyone's house.
+TOUCH = ["binary_sensor.doorbell_button", "binary_sensor.front_door_motion"]
 THERMO = ["sensor.a_temperature", "sensor.b_temperature"]
 
 BASE_CFG = {

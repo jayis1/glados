@@ -13,6 +13,17 @@
   "mood_models": ["glados"],
   "mood_ingest": true,
 
+  "_ha_entities_note": "Put YOUR Home Assistant entity ids here. gladosd.py's defaults for these two keys are placeholders that resolve to nothing - verified, 404 from /api/states for every one of them - because an entity id names the rooms, doors and devices of a specific house and gladosd.py is public. load_config() does a flat dict update, so each list below replaces the default wholesale. If ha_ingest.sites.<site>.entities in /health is smaller than your list, this file did not load and the sense is deaf.",
+  "ha_touch_entities": [
+    "binary_sensor.doorbell_button",
+    "binary_sensor.front_door_motion",
+    "binary_sensor.hallway_presence"
+  ],
+  "ha_thermo_entities": [
+    "sensor.living_room_temperature",
+    "sensor.nas_cpu_temperature"
+  ],
+
   "multimodal": true,
   "multimodal_models": ["glados"],
   "glados_voice": "af_jessica",

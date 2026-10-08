@@ -1,0 +1,40 @@
+{
+ "change": "Home Assistant entity ids genericised in the public repository at the owner's request.",
+ "deployment_unaffected": {
+  "coupled_models": [
+   "glados"
+  ],
+  "entities_seen_after_first_poll": 10,
+  "ha_ingest.sites.hygro_thermo.entities": 4,
+  "ha_ingest.sites.mechanosensory.entities": 6,
+  "last_error": null,
+  "method": "paperclip-gladosd restarted to load the moved config, then /health read back",
+  "mood_source": "live",
+  "note": "6 + 4 is the real list, not the 3 + 4 placeholders, so the override loaded. /health exposes counts only, never entity names.",
+  "poll_errors": 0
+ },
+ "measured_at": "2026-10-08T22:50:00+02:00",
+ "method": "The real list was moved out of gladosd.py's DEFAULTS into the deployment's local, unpublished config.json. load_config() does a flat dict update, so the two keys replace the published defaults wholesale. The published defaults are placeholders.",
+ "placeholders_resolve_to_nothing": {
+  "binary_sensor.doorbell_button": 404,
+  "binary_sensor.front_door_motion": 404,
+  "binary_sensor.hallway_presence": 404,
+  "note": "The first run of this check returned 000 for every entity INCLUDING the controls - a wrong env var name, so no request was made at all. Without the positive controls that would have read as 'the placeholders do not exist'.",
+  "positive_controls": "two entity ids from the live install, held back for the same reason the rest were: both returned 200. Naming them here would defeat the change.",
+  "route": "GET <ha>/api/states/<entity> with the live token",
+  "sensor.disk_1_temperature": 404,
+  "sensor.disk_2_temperature": 404,
+  "sensor.living_room_temperature": 404,
+  "sensor.nas_cpu_temperature": 404
+ },
+ "remaining_published_vs_deployed_difference": "gladosd.py's docstring host addresses, and these two entity lists. Both are now stated in docs/SERVER.md.",
+ "repo_scan_after": "no occurrence of any real entity id remains anywhere in the published tree, this file included",
+ "tests": {
+  "note": "run on the live host against the live fly and real sockets",
+  "test_ha_senses.py": "50 passed, 0 failed",
+  "test_mood.py": "98 passed, 0 failed",
+  "test_senses.py": "71 passed, 0 failed",
+  "total": "219 passed, 0 failed"
+ },
+ "why_not_just_edit_the_published_copy": "That would leave the published server/ code silently different from the code the measurements were taken against. Moving the house-specific values into local config keeps published == deployed for the logic and puts the private data where private data belongs."
+}

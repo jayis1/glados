@@ -5,12 +5,21 @@
 > workflows describe the deployment this was built for. Raw logs for every
 > number are in [`../measurements/raw/`](../measurements/raw/).
 >
-> **`server/` is published exactly as deployed**, which means its paths are
-> absolute to that host's `/opt` prefix (`/opt/paperclip-gladosd`,
-> `/opt/paperclip-glados/token`, and so on). That is deliberate: this is the
-> reference implementation that the measurements in this repository were taken
-> against, not a package to install. Every path is a key in `DEFAULTS` with a
-> `config.json` override — see
+> **`server/` is published as deployed, with two named exceptions**, which
+> means its paths are absolute to that host's `/opt` prefix
+> (`/opt/paperclip-gladosd`, `/opt/paperclip-glados/token`, and so on). That is
+> deliberate: this is the reference implementation that the measurements in this
+> repository were taken against, not a package to install. The exceptions are
+> the host addresses in `gladosd.py`'s docstring, and
+> `ha_touch_entities` / `ha_thermo_entities`, whose defaults here are
+> **placeholders that resolve to nothing** (404 from HA's `/api/states` for
+> every one of them, checked) — a Home Assistant entity id names the rooms,
+> doors and devices of a specific house, so the deployment's real list was
+> moved into its local `config.json` and the code default was genericised. That
+> is the *only* functional difference, it is a `DEFAULTS` key like any other,
+> and `/health` reports how many entities each site ended up with so a missing
+> override is visible rather than silent. Every path is likewise a key in
+> `DEFAULTS` with a `config.json` override — see
 > [`../server/config.example.json`](../server/config.example.json). The
 > `fly/` layer, by contrast, *has* been made repo-relative, because
 > reproducing the brain is something you are meant to be able to do.

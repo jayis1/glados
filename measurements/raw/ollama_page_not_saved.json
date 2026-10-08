@@ -1,0 +1,46 @@
+{
+ "api_key_probe": {
+  "bodies": "all four identical: 'Unauthorized\\n'",
+  "conclusion": "No differentiation and no WWW-Authenticate challenge, so there is no evidence of a bearer path on this route. Not worth asking the owner to mint a key. This does not PROVE the absence of one - an invalid key and an ignored key look the same - and it is recorded as the weak evidence it is.",
+  "page_after": "stored readme re-read: 10103 chars, byte-identical. The refused writes wrote nothing.",
+  "payload": "the intended ollama-page.md content, deliberately: the only possible success case of this probe is the desired page state rather than damage",
+  "question": "Does the save route accept an ollama.com account API key, which would be a 40-char paste instead of a 13 KB one?",
+  "requests": {
+   "Authorization: Bearer <empty>": 401,
+   "Authorization: Bearer <fake>": 401,
+   "X-Api-Key: <fake>": 401,
+   "anonymous": 401
+  },
+  "www_authenticate": null
+ },
+ "description_field": "https://github.com/jayis1/glados (unchanged, still a bare URL)",
+ "measured_at": "2026-10-08T22:45:00+02:00",
+ "most_likely_cause": {
+  "evidence": "An anonymous GET (no cookies) returns the page with <textarea id=\"editor\"> populated; the same anonymous HTML contains 'Sign in' and '/signin' and no account/avatar/sign-out markers. So Edit, the textarea and Save are all reachable while logged out, and the save then fails 401 server-side.",
+  "finding": "The edit box is served to SIGNED-OUT visitors in a fully usable state.",
+  "second_candidate": "The Preview tab renders without saving, so a correct-looking preview is still unsaved."
+ },
+ "question": "The owner reported pasting the readme. Did the page change?",
+ "source_ollama_page_md": {
+  "bold_**": 98,
+  "bullets": 10,
+  "chars": 12909,
+  "code_fences": 8,
+  "headings_##": 8,
+  "table_seps": 3,
+  "tabs": 0
+ },
+ "stored_readme": {
+  "bold_**": 0,
+  "bullets": 0,
+  "chars": 10103,
+  "code_fences": 0,
+  "contains_word_waiting": true,
+  "diagram_style": "+------+ (the pre-box-drawing version)",
+  "first_line": "An AI whose moods come from a fruit fly.",
+  "headings_##": 0,
+  "table_seps": 0,
+  "tabs": 18
+ },
+ "verdict": "NO. The stored readme is byte-stable at 10103 characters, the same value measured at 2026-10-08T21:05Z, and still the pre-doorbell text. Nothing was saved; the description field is likewise still a bare URL."
+}

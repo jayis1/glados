@@ -168,13 +168,17 @@ DEFAULTS = {
     # agitation (raw 0.19). Capped
     # well short of the 0.4 afferent.py uses for hearing, because the same
     # drive is 5x stronger here: 0.4 would pin her at maximum permanently.
+    # These are PLACEHOLDERS, not this install's list. Entity ids name the
+    # rooms, devices and doors of somebody's house, so the real ones live in
+    # config.json, which is local and unpublished; load_config's flat update
+    # replaces this list wholesale. If `entities` in /health is smaller than
+    # you expect, your override did not load and these names are what is
+    # being polled - no HA entity is called any of them, so the sense is
+    # simply deaf rather than wrong.
     "ha_touch_entities": [
-        "binary_sensor.front_door_visitor",
-        "binary_sensor.front_door_person",
-        "binary_sensor.front_door_vehicle",
-        "binary_sensor.front_door_pet",
-        "binary_sensor.front_door_bevaegelse",
-        "binary_sensor.presence_sensor_fp2_6010_presence_sensor_1",
+        "binary_sensor.doorbell_button",
+        "binary_sensor.front_door_motion",
+        "binary_sensor.hallway_presence",
     ],
     "ha_touch_kick": 0.02,
     "ha_touch_tau_s": 120.0,
@@ -184,12 +188,13 @@ DEFAULTS = {
     # probes, the living-room sensor and the only humidity sensor - so her
     # thermal sense is the heat coming off the hardware she runs on. Those are
     # live and they move (1.0-3.7 degC mean step). If the thermostats come
-    # back, put them at the front of this list.
+    # back, put them at the front of the list - in config.json, not here:
+    # these are PLACEHOLDERS for the same reason as the touch list above.
     "ha_thermo_entities": [
-        "sensor.nasty_temperature",
-        "sensor.disk_box1_ct2000p3ssd8_temperature",
-        "sensor.disk_box3_ct2000p3ssd8_temperature",
-        "sensor.nasty_drive_1_temperature",
+        "sensor.living_room_temperature",
+        "sensor.nas_cpu_temperature",
+        "sensor.disk_1_temperature",
+        "sensor.disk_2_temperature",
     ],
     "ha_thermo_kick": 0.01,
     # 60 s, not the 180 s this started at, and the reason is a measurement.

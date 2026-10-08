@@ -573,6 +573,8 @@ server/                layer 2 — mood → words
   mood.py                state → clause + temperature, and all the fail-open paths
   afferent.py            her own traffic → the auditory nerve
   ha_afferent.py         the front door → touch, the hardware's heat → thermo
+                         (its entity ids in gladosd.py are placeholders
+                          that resolve to nothing — put yours in config.json)
   senses.py              vision, hearing and voice behind one model name
   gladosd.py             the Ollama-compatible front end
   test_mood.py           fail-open tests against real sockets

@@ -359,6 +359,31 @@ the README, in `mood.py`, and here.
 
 ---
 
+## The entity ids in `server/gladosd.py` are placeholders
+
+`ha_touch_entities` and `ha_thermo_entities` in the published `DEFAULTS` are
+**not** the deployment's list. A Home Assistant entity id names the rooms, doors
+and devices of a particular house, so at the owner's request the real list was
+moved into that install's local `config.json` — which is not in this repository
+— and the code default was genericised. `load_config()` does a flat dict update,
+so those two keys are replaced wholesale.
+
+The placeholders are checked to resolve to **nothing**: HA returns `404` from
+`/api/states` for all seven, with two real entity ids as positive controls
+returning `200`
+([`entity_genericise.json`](../measurements/raw/entity_genericise.json)). Those
+controls matter — the first run of the check returned `000` for every entity
+*including* the controls, because of a wrong environment variable name, and
+without them it would have read as a clean result.
+
+So a fresh clone polls entities that do not exist and the sense is simply
+**deaf**, not wired to something unexpected. `/health` reports how many entities
+each site ended up with, so a missing override is visible rather than silent.
+This and the host addresses in `gladosd.py`'s docstring are the only two
+differences between `server/` and the deployed code.
+
+---
+
 ## Withdrawn claims
 
 Kept rather than deleted, because a project that only publishes its wins is not

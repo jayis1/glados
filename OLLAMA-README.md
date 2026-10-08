@@ -95,6 +95,26 @@ unnoticed.
 
 <https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md>
 
+## First, the failure that has already happened twice
+
+**A signed-out tab is served a fully working edit box.** The `<textarea>` above
+was read out of an *anonymous* fetch — no cookies at all — and the same
+anonymous page carries a `Sign in` link and no account markers. So the Edit
+button, the box, the paste and the **Save** click are all available to a visitor
+who is not logged in, and the save then fails `401` server-side.
+
+That is the most likely reason a paste "went in" and the page did not change.
+Before anything else: look for your avatar in the top right of
+<https://ollama.com/jais/GLaDOS>. If it says **Sign in**, that tab cannot write,
+however convincing the edit box looks.
+
+The second most likely reason is the **Preview** tab: it renders the markdown
+without saving it, so a page that previews perfectly is still unsaved until
+**Save** is clicked.
+
+Route 2 below now reads the page back after writing and says which of these
+happened, instead of leaving you to guess.
+
 ## Route 1 — four keystrokes
 
 That raw link has nothing in it but the page text, so there is nothing to trim:
@@ -120,8 +140,17 @@ description in the same action. On the model page, signed in, press `F12` and go
 to **Console**:
 
 ```js
-(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const t=await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text();const r=await P({readme:t.trim()});alert('description '+d.status+', readme '+r.status);location.reload()})()
+(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;alert(ok?'SAVED and verified: '+got.length+' chars, markdown intact. Reloading.':((d.status===401||r.status===401)?'NOT SAVED (401). This tab is signed out of ollama.com - sign in, then run this again.':'NOT SAVED: description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars'));if(ok)location.reload()})()
 ```
+
+**It checks its own work.** After both writes it re-fetches the page with
+`cache: 'no-store'`, reads the stored markdown back out of the edit box, and
+only says `SAVED` if that text contains real `## ` headings and matches the
+source length. Otherwise it says `NOT SAVED` and why — a `401` is named as
+*"this tab is signed out"*, anything else reports both status codes and how many
+characters the page is still holding. The read-back half was dry-run against the
+live page's real HTML, where it correctly reports the current unsaved state, so
+the failure branch is tested rather than hoped for.
 
 It writes the description first and the readme second, deliberately. Both are
 partial updates to the same endpoint — the page's own UI posts `summary` on its
@@ -147,7 +176,7 @@ a bookmark's URL field is not blocked.
 2. Name it `GLaDOS readme`; replace its URL with:
 
 ```
-javascript:(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const t=await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text();const r=await P({readme:t.trim()});alert('description '+d.status+', readme '+r.status);location.reload()})()
+javascript:(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;alert(ok?'SAVED and verified: '+got.length+' chars, markdown intact. Reloading.':((d.status===401||r.status===401)?'NOT SAVED (401). This tab is signed out of ollama.com - sign in, then run this again.':'NOT SAVED: description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars'));if(ok)location.reload()})()
 ```
 
 3. Open <https://ollama.com/jais/GLaDOS> and click the bookmark. The page
