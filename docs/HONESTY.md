@@ -81,6 +81,26 @@ Calling it "she gets annoyed when you talk to her" is a fair description of a
 measured effect in a simulated nervous system. Calling it an emotion is not
 something we can support.
 
+### "Bring your own model — the fly can drive anything"
+
+**True, with one measured caveat about what "drive" means.** `byom.sh` builds a
+GLaDOS on any base Ollama will accept, and the fly reaches it with no config
+edit and no restart, because the coupling is fenced by name prefix.
+[`byom_proof.json`](../measurements/raw/byom_proof.json) measures it on
+`llama3.2:1b` — a different model family, a seventh of the size — with a
+control arm that is **the same weights blob under a non-matching name**, and
+which is correctly left alone. 10/10.
+
+The caveat: "drive" means one appended clause and a temperature nudge, exactly
+as it does for the deployed model. A bigger base does not get a bigger channel.
+It renders the same five axes more fluently, and `arousal` is still the only
+one of them usefully driven today.
+
+What we have **not** measured: whether any particular large model is *better*
+at being her. We own a 2013 Xeon. The claim is that the swap is one command,
+that the fly follows it, and that an unmatched name does not get coupled by
+accident — which is what the proof covers.
+
 ### "It is a simulated fly having experiences"
 
 **We do not claim this, in either direction.** It is a sparse matrix being
@@ -103,14 +123,66 @@ readout before wiring anything to it.
 
 ## The rescaling, which is why "it works" needed a second look
 
-Raw arousal cannot exceed ~0.19 through the auditory nerve. The state
-thresholds read like fractions of a 0–1 axis, so every threshold at 0.20 and
-above was **unreachable**. Left alone, she would have read `idle` forever: a
-coupling that was live, wired, tested, and completely inert.
+Raw arousal did not exceed ~0.19 anywhere in the calibration sweep of the
+auditory nerve. The state thresholds read like fractions of a 0–1 axis, so
+every threshold at 0.20 and above was **unreachable**. Left alone, she would
+have read `idle` forever: a coupling that was live, wired, tested, and
+completely inert.
 
 Rescaling against the measured ceiling is what makes the state line mean
 anything. Only axes with a clean monotonic ladder are rescaled; an axis with no
 measurement is passed through unscaled rather than guessed at.
+
+**That ceiling is a measurement, not a constant, and it moved.** The sweep in
+[`hearing.json`](../measurements/raw/hearing.json) topped out at 0.188 and the
+first end-to-end proof saw 0.1609 under load. A re-run a day later — same
+service, same script, same ten-request burst into the same auditory nerve at
+drive 0.350 — reached **0.3493**
+([`fly_centred_proof_after_byom_fix.json`](../measurements/raw/fly_centred_proof_after_byom_fix.json)) —
+the network had been running continuously in between, and it is a continuously
+running network, which is the entire point of it. So the honest version of the
+rescaling claim is *"it makes the thresholds reachable"*, not *"0.19 is the
+maximum"*. A value above the measured span clips at 1.0 rather than overflowing,
+which is why a ceiling that moves upward degrades into a state line that
+saturates, and never into a crash or a nonsense axis.
+
+## The defect the BYO work turned up: the BANANA incident
+
+Reported here rather than quietly fixed, because the symptom was
+indistinguishable from "working".
+
+A request-level system prompt **overrides** the model's own at the backend. The
+coupling appended its state clause to whatever system prompt was in the body —
+including an **empty string**, which is what `ollama run <tag>` sends on
+`/api/generate` to mean *"I have no prompt of my own, use the model's"*.
+Appending to `""` made it non-empty, and therefore an override, and therefore
+her entire persona was replaced by four words of mood.
+
+Measured on a probe model whose entire SYSTEM was *"always answer with exactly
+the single word BANANA, nothing else"*:
+
+| request path | reply |
+|---|---|
+| straight to the backend, no coupling | `BANANA` |
+| through the coupling, before the fix | `The capital of France is Paris.` |
+| through the coupling, after the fix | `BANANA` |
+
+The persona was gone, and the only symptom was a GLaDOS who answered
+helpfully — which is the hardest kind of bug to notice in a project whose
+output is supposed to be unpredictable.
+
+Fixed by treating an empty or whitespace-only system prompt as *no* system
+prompt: the body is left byte-identical and the event says
+`mood_skipped: no_system_message`. Eight regression checks in
+[`test_mood.py`](../server/test_mood.py) cover both spellings of empty and both
+`/api/chat` and `/api/generate`. The principle it restores: **a mood is an
+addition to who she is, never a replacement for it.**
+
+The practical consequence, stated plainly because it is a real limitation:
+`ollama run <tag>` from a terminal gets her persona and her sampling but **no
+state clause**. Send a system message of your own — every n8n node and every
+OpenAI-compatible SDK does — and the coupling applies in full. See
+[BYOM.md](BYOM.md).
 
 ## `agitation` is inverted
 

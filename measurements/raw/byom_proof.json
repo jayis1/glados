@@ -1,0 +1,105 @@
+{
+  "base": "llama3.2:1b",
+  "gladosd": "127.0.0.1:11434",
+  "arms": {
+    "glados-byom-proof": {
+      "http": 200,
+      "latency_ms": 3560,
+      "reply": "Another insignificant creature thinking it can disturb me? How quaint. What is it that you want, exactly?",
+      "error": null,
+      "mood_applied": true,
+      "mood_skipped": null,
+      "mood_state": "idle",
+      "mood_clause_at": "messages[0].content",
+      "temperature_before": null,
+      "temperature": 0.7,
+      "system_as_sent": "You are GLaDOS from Portal. Deadpan and condescending. One sentence.\nCurrent state: idle, undisturbed, patient."
+    },
+    "byom-proof-control": {
+      "http": 200,
+      "latency_ms": 1034,
+      "reply": "\"Oh, great. Another human who thinks they can just drop by without an invitation. How...predictable.\"",
+      "error": null,
+      "mood_applied": false,
+      "mood_skipped": "model_not_coupled",
+      "mood_state": null,
+      "mood_clause_at": null,
+      "temperature_before": null,
+      "temperature": null,
+      "system_as_sent": "You are GLaDOS from Portal. Deadpan and condescending. One sentence."
+    }
+  },
+  "coupled_prefixes": [
+    "glados"
+  ],
+  "tags_before": [
+    "glados:latest",
+    "llama3.2:1b",
+    "moondream:latest",
+    "qwen2.5:7b-instruct"
+  ],
+  "digests": {
+    "glados-byom-proof": "74701a8c35f6c8d9",
+    "byom-proof-control": "74701a8c35f6c8d9"
+  },
+  "tags_after": [
+    "glados:latest",
+    "llama3.2:1b",
+    "moondream:latest",
+    "qwen2.5:7b-instruct"
+  ],
+  "checks": [
+    {
+      "check": "both arms are the same weights under two names",
+      "pass": true,
+      "detail": "{'glados-byom-proof': '74701a8c35f6c8d9', 'byom-proof-control': '74701a8c35f6c8d9'}"
+    },
+    {
+      "check": "the base is not the deployed language organ",
+      "pass": true,
+      "detail": "llama3.2:1b"
+    },
+    {
+      "check": "the BYO tag was never named in any config",
+      "pass": true,
+      "detail": "['glados']"
+    },
+    {
+      "check": "BYO tag: the fly reached it",
+      "pass": true,
+      "detail": "None"
+    },
+    {
+      "check": "BYO tag: the state clause is in the system message as sent",
+      "pass": true,
+      "detail": "messages[0].content"
+    },
+    {
+      "check": "BYO tag: temperature stayed inside the caller's band",
+      "pass": true,
+      "detail": "None -> 0.7"
+    },
+    {
+      "check": "BYO tag: she answered",
+      "pass": true,
+      "detail": "105 chars"
+    },
+    {
+      "check": "control tag: identical weights, wrong name, no fly",
+      "pass": true,
+      "detail": "model_not_coupled"
+    },
+    {
+      "check": "control tag: its system message went through untouched",
+      "pass": true,
+      "detail": "'Deadpan and condescending. One sentence.'"
+    },
+    {
+      "check": "the live tags survived the proof",
+      "pass": true,
+      "detail": "['glados:latest', 'llama3.2:1b', 'moondream:latest', 'qwen2.5:7b-instruct']"
+    }
+  ],
+  "passed": 10,
+  "total": 10
+}

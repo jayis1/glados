@@ -5,9 +5,10 @@ Every number quoted anywhere in this repository comes from a file in
 readability, or reconstructed afterwards. If a claim in the README is not
 backed by one of these, that is a bug.
 
-All taken 2026-10-07 on the deployment host: a 2013 Xeon E5-2690 v2 (20 CPUs
-across two NUMA nodes, only 10 of them full physical cores), one GTX 1660
-SUPER, two T400 4 GB.
+All taken on the deployment host — a 2013 Xeon E5-2690 v2 (20 CPUs across two
+NUMA nodes, only 10 of them full physical cores), one GTX 1660 SUPER, two T400
+4 GB — on 2026-10-07, except the two files dated 2026-10-08 in the end-to-end
+table below.
 
 ## The fly
 
@@ -32,6 +33,8 @@ SUPER, two T400 4 GB.
 |---|---|
 | [`raw/fly_centred_proof.json`](raw/fly_centred_proof.json) | The fly changes what she says, **with a control arm**: same prompt and conditions to an uncoupled tag, which reports `mood_skipped=model_not_coupled`. Rest → `idle`, temp 0.700. Busy → `alert`, raw arousal 0.1609, temp 0.869. Then decay: alert → stirring → idle over three minutes. 9 assertions. |
 | [`raw/one_model_proof.json`](raw/one_model_proof.json) | One name over five engines, tested over the wire only — no imports, no internals — because that is what the claim is about. Includes the control arm that sends all four sense fields to the uncoupled tag and asserts they do nothing. 20 assertions. |
+| [`raw/byom_proof.json`](raw/byom_proof.json) | **Bring your own model** (2026-10-08). Two tags built from the same `llama3.2:1b` blob, differing only in their name: `glados-byom-proof` is coupled with no config edit anywhere, and `byom-proof-control` reports `model_not_coupled` with its system message untouched. Proves the fence is the *name* and the coupling is base-independent. 10 assertions. |
+| [`raw/fly_centred_proof_after_byom_fix.json`](raw/fly_centred_proof_after_byom_fix.json) | The end-to-end proof re-run (2026-10-08) after the empty-system-prompt fix, as that fix's regression guard. 9/9 again. Also the file showing the arousal ceiling is **not a constant**: raw 0.3493 here against 0.1609 the day before, same script and same drive burst. Read [`../docs/HONESTY.md`](../docs/HONESTY.md) before quoting either number. |
 
 ## Device placement for the language model
 

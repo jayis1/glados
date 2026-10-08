@@ -153,6 +153,35 @@ check("no system message -> prompt untouched", nosys == before)
 check("no system message -> skipped, not invented",
       note.get("mood_skipped") == "no_system_message", note)
 
+# An EMPTY system string is "none", not "a system message that happens to be
+# short". `ollama run <tag>` sends /api/generate with `"system": ""`, and a
+# request-level system prompt OVERRIDES the Modelfile's at the backend - so
+# appending to "" replaced her entire persona with the clause. Measured
+# against a probe model whose SYSTEM was "answer with exactly the single word
+# BANANA": straight to the backend, "BANANA"; through the coupling before this
+# guard, "The capital of France is Paris." Both spellings of empty are tested,
+# and the /api/chat shape too, because a blank system message in a list is
+# just as empty as a blank string.
+for label, blank in (("empty", ""), ("whitespace", "  \n ")):
+    gen = {"model": "qwen2.5:7b-instruct", "prompt": "Describe this.",
+           "system": blank, "stream": False}
+    before = copy.deepcopy(gen)
+    note = mood.apply_mood_policy(gen, BASE_CFG)
+    check("%s system (generate) -> body byte-identical" % label, gen == before,
+          repr(gen.get("system")))
+    check("%s system (generate) -> skipped, persona left alone" % label,
+          note.get("mood_skipped") == "no_system_message", note)
+
+    chat = {"model": "qwen2.5:7b-instruct", "stream": False,
+            "messages": [{"role": "system", "content": blank},
+                         {"role": "user", "content": "Someone is at the door."}]}
+    before = copy.deepcopy(chat)
+    note = mood.apply_mood_policy(chat, BASE_CFG)
+    check("%s system (chat) -> body byte-identical" % label, chat == before,
+          repr(chat["messages"][0]["content"]))
+    check("%s system (chat) -> skipped, persona left alone" % label,
+          note.get("mood_skipped") == "no_system_message", note)
+
 
 # ---------------------------------------------------------------------------
 print("\n== 2. live moodd: append-only, inside the node's own band ==")

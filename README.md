@@ -6,8 +6,9 @@ Not a metaphor. Not a prompt that says "pretend to have feelings." There is a
 simulation of an actual *Drosophila melanogaster* brain — 164,587 neurons and
 24,539,704 synapses, reconstructed from electron micrographs of a real fly —
 running on two GPUs in a cupboard. Its firing rates are read out five times a
-second and they decide what kind of mood GLaDOS is in. Her language model is
-downstream of an insect.
+second, and they decide what kind of mood GLaDOS is in.
+
+Her language model is downstream of an insect. The insect is in charge.
 
 ```
     doorbell, motion, someone talking to her
@@ -26,7 +27,8 @@ downstream of an insect.
                       │
                       ▼
       ┌───────────────────────────────────┐
-      │  a 7B language model              │   ← how she speaks
+      │  any language model you like      │   ← how she speaks
+      │  swap it: ./byom.sh <base>        │     (the replaceable part)
       └───────────────────────────────────┘
                       │
                       ▼
@@ -96,6 +98,70 @@ personality. Everything below is what happens when you bolt a fly to it.
 
 ---
 
+## Bring your own model
+
+The fly is the part that is ours. The mouth is a **replaceable part**.
+
+```bash
+./byom.sh llama3.1:8b          # -> glados-llama3.1
+./byom.sh qwen3:32b big        # -> glados-big
+./byom.sh hf.co/user/repo:Q4   # -> glados-repo
+```
+
+Same persona, same sampling band, same five axes, same 164,587 neurons.
+Different weights doing the talking. **Still a fruit fly at the helm** — a
+bigger base does not make the fly less in charge, it makes the fly's state
+better rendered.
+
+This is not a feature bolted on afterwards; it is what the architecture was for.
+`qwen2.5:7b-instruct` is not here because it is the best language model
+available. It is here because it fits in the RAM of one 2013 Xeon that also has
+to run a fly. Nothing about *who she is* lives in those weights:
+
+| | lives where | survives a model swap? |
+|---|---|---|
+| her continuity | membrane potentials in a running connectome | **yes** |
+| her personality | 30 words in a `Modelfile` | **yes** |
+| her mood | a clause and a temperature, computed outside the model | **yes** |
+| her fluency | the weights | no — that is the bit you are upgrading |
+
+### The one rule: the name is the fence
+
+The coupling is fenced by **name prefix**. Anything called `glados*` gets the
+fly; anything else goes through byte-identical. So `glados-big` is coupled
+**the moment it exists** — no config edit, no restart, no server change — and
+the plain `qwen2.5:7b-instruct` that other software on the host depends on
+never suddenly develops opinions.
+
+`byom.sh` renames your tag to match rather than printing a warning you would
+scroll past, because a silently-uncoupled GLaDOS is the most disappointing
+possible outcome: she still answers in character, she just has no moods, for
+ever.
+
+### Proof, with a control arm that is the same weights under a different name
+
+"It is coupled" is exactly the kind of claim that quietly isn't, so
+[`server/proof_byom.py`](server/proof_byom.py) builds two tags from **one
+`llama3.2:1b` blob** — a different model family, a seventh of the size — and
+changes nothing but the name:
+
+| | `glados-byom-proof` | `byom-proof-control` |
+|---|---|---|
+| base weights | blob `74701a8c35f6…` | *the same blob* |
+| named in any config | no | no |
+| did the fly reach it? | **yes**, clause at `messages[0].content` | **no** — `model_not_coupled` |
+| she said | *"Another insignificant creature thinking it can disturb me? How quaint."* | *"Oh, great. Another human who thinks they can just drop by without an invitation."* |
+
+10/10 assertions, raw output in
+[`measurements/raw/byom_proof.json`](measurements/raw/byom_proof.json), both
+proof tags removed afterwards and the live tag list re-read to show it survived.
+
+Full details — what your base needs, why `num_predict` is load-bearing, and
+why a 1B GLaDOS is a perfectly adequate GLaDOS — in
+**[docs/BYOM.md](docs/BYOM.md)**.
+
+---
+
 ## Three layers, and an honest ledger
 
 Here is exactly what is ours and what is borrowed. The interesting half is the
@@ -107,7 +173,7 @@ half nobody can download.
 | **what she senses** | her own traffic → the fly's auditory nerve; doorbell and motion → its mechanosensory nerve | **yes** |
 | **how mood reaches words** | state → one appended clause + a temperature nudge | **yes** |
 | **that she is GLaDOS at all** | `Modelfile` — the persona, the sampling band | **yes** |
-| **how she speaks** | `qwen2.5:7b-instruct`, ~7.6 × 10⁹ parameters someone else fitted on ~10¹³ tokens | **no** |
+| **how she speaks** | `qwen2.5:7b-instruct`, ~7.6 × 10⁹ parameters someone else fitted on ~10¹³ tokens — *or whatever you point `byom.sh` at* | **no** |
 | **how she sees** | `moondream` | no |
 | **how she hears** | `whisper large-v3` | no |
 | **her voice** | `kokoro` | no |
@@ -123,7 +189,8 @@ So the division of labour is deliberate, and it is the whole idea:
 > renderer of that state.**
 
 Before this, the LLM *was* GLaDOS and the fly was a decoration. Now it is the
-other way round.
+other way round — which is also why the renderer is swappable and the fly
+is not.
 
 ---
 
@@ -205,20 +272,30 @@ negative.** She is measurably annoyed by being talked to.
 Nobody wrote that. It is not in a prompt, it is not a rule, and it was not on
 anyone's plan. It is what a real fly's connectome does when you hold its
 auditory nerve on, and it happens to be the most GLaDOS thing in the entire
-project.
+project. (The magnitude is tiny and the effect is not monotonic;
+[docs/HONESTY.md](docs/HONESTY.md) holds that claim to its actual size before
+you quote it at a party.)
 
 ### The rescaling that stopped it all being theatre
 
-Raw arousal cannot exceed about 0.19 through hearing. The state thresholds
-read like fractions of a 0–1 axis — so every threshold at 0.20 or above was
-**unreachable**, and she would have read `idle` forever while we congratulated
-ourselves on a working brain.
+Raw arousal never exceeded about 0.19 anywhere in that sweep. The state
+thresholds read like fractions of a 0–1 axis — so every threshold at 0.20 or
+above was **unreachable**, and she would have read `idle` forever while we
+congratulated ourselves on a working brain.
 
 So the axes are rescaled against the measured ceiling, and only the axes with a
 clean monotonic ladder are rescaled at all. An axis with no measurement is
 passed through untouched rather than guessed at. This is the difference between
 a coupling and a decoration, and it was one line of code and an afternoon of
 measuring.
+
+And then the ceiling moved. A re-run a day later — same script, same drive,
+same nerve — reached raw **0.3493** where the first had topped out at 0.1609.
+It is a continuously running network that had been running continuously, which
+is the entire point of it, so the honest form of the claim is *"rescaling makes
+the thresholds reachable"* and never *"0.19 is the maximum"*. Values above the
+measured span clip at 1.0, so a ceiling that drifts upward degrades into a
+saturated state line, not a crash.
 
 ---
 
@@ -228,14 +305,21 @@ Claiming "her mood affects her output" is easy. Here is the measurement, with a
 control arm — the same prompt, same conditions, sent to an *uncoupled* model
 tag, so the effect cannot be a coincidence of load:
 
+All three arms below are one run, 2026-10-08, in the order they happened:
+
 ```
 rest   state=idle    raw arousal 0.0000   temp 0.700
-       → "Do I look like a doorman to you?"
+       phrase: "idle, undisturbed, patient"
+       → "Oh, really? I suppose you could go answer that, if you're not
+          too busy being human."
 
-busy   state=alert   raw arousal 0.1609   temp 0.869
-       → "Oh, just another unwelcome visitor. What a surprise."
+busy   state=alert   raw arousal 0.3493   temp 0.900
+       phrase: "something moving in the building"
+       → "Prepare for a series of tests to determine your eligibility
+          for entry."
 
 ctrl   uncoupled tag → mood_skipped=model_not_coupled   (fly ignored, as designed)
+       → "Really? I've been here the whole time."
 ```
 
 And then she calms down on her own, because the fly's membrane potentials decay
@@ -245,8 +329,9 @@ like a real one's:
 alert  (t+60s)  →  stirring  (t+120s)  →  idle  (t+180s)
 ```
 
-Nine assertions, all passing. Raw JSON in
-[`measurements/raw/fly_centred_proof.json`](measurements/raw/fly_centred_proof.json).
+Nine assertions, all passing, twice on two different days:
+[`fly_centred_proof.json`](measurements/raw/fly_centred_proof.json) and
+[`fly_centred_proof_after_byom_fix.json`](measurements/raw/fly_centred_proof_after_byom_fix.json).
 
 ---
 
@@ -307,11 +392,43 @@ scars.
    most 0.3, never past 0.9. A caller that chose 0.2 chose determinism and
    keeps its floor.
 
+90 checks, 0 failures, against the live fly and real sockets
+([`server/test_mood.py`](server/test_mood.py)).
+
 One deliberate exception to fail-open: a request whose *only* content is audio
 or an image, where that sense failed, returns **502** naming the dead sense.
 Answering anyway would mean inventing an utterance nobody made. Fail open means
 never losing words she has — it must not mean fabricating words she never
 heard.
+
+### The BANANA incident
+
+Rule 3 says *append, never edit*, and we thought we were obeying it. Then the
+bring-your-own-model work turned up a request shape nobody had tested: a system
+prompt that is the **empty string**, which is how `ollama run <tag>` spells
+*"I have no prompt of my own, use the model's."*
+
+A request-level system prompt **overrides** the model's own at the backend. So
+appending four words of mood to `""` made it non-empty, made it an override,
+and silently replaced her entire personality with the mood clause.
+
+Measured on a probe model whose whole SYSTEM was *"always answer with exactly
+the single word BANANA, nothing else"*:
+
+| path | reply |
+|---|---|
+| straight to the backend | `BANANA` |
+| through the coupling, before | `The capital of France is Paris.` |
+| through the coupling, after | `BANANA` |
+
+The persona was gone and the only symptom was **a GLaDOS who answered
+helpfully** — the hardest kind of bug to spot in a project whose output is
+meant to be unpredictable. An empty system prompt now counts as *no* system
+prompt: the body goes through byte-identical and the event log says
+`mood_skipped: no_system_message`. Eight regression checks, both spellings of
+empty, both API shapes.
+
+**A mood is an addition to who she is, never a replacement for it.**
 
 ---
 
@@ -321,6 +438,7 @@ heard.
 Modelfile              the portable persona build — this is the "model"
 Modelfile.cpu-tuned    the deployed variant, with the 5× placement cliff measured
 install.sh             the two commands, with the checks
+byom.sh                bring your own model: any base, same fly
 
 fly/                   layer 1 — the brain
   engine.py              sharded LIF simulation, named sensory populations
@@ -337,11 +455,14 @@ server/                layer 2 — mood → words
   gladosd.py             the Ollama-compatible front end
   test_mood.py           fail-open tests against real sockets
   proof_fly_centred.py   the end-to-end proof, with its control arm
+  proof_byom.py          the fly drives a base it has never seen, with its control arm
 
 measurements/raw/      every number quoted anywhere, as the tool emitted it
 docs/                  the long versions
 ```
 
+- **[docs/BYOM.md](docs/BYOM.md)** — bring your own model: the name fence, what
+  your base needs, and how to pick a bigger brain honestly.
 - **[docs/FLY.md](docs/FLY.md)** — the brain: sharding, calibration, the
   operating point, and why 4.575 ms/step is the number that matters.
 - **[docs/SERVER.md](docs/SERVER.md)** — the front end: device placement,
@@ -375,13 +496,46 @@ tuned CPU.
 
 ---
 
+## Questions you are probably having
+
+**Is the fly actually necessary?**
+No. Obviously not. A `random.choice` over five mood strings would be cheaper,
+faster and indistinguishable in a demo. It would also be a lie, and it would
+not have produced a valence curve that drifts negative when you talk to her —
+which nobody authored, nobody predicted, and no random number generator would
+have handed us.
+
+**Does the fly know it is GLaDOS?**
+It is a sparse matrix being multiplied. We are careful about this in both
+directions; see [docs/HONESTY.md](docs/HONESTY.md).
+
+**Can I run it without the fly?**
+Yes — that is the two-command install. You get the persona and the voice and a
+fixed mood. The fly is the part that needs a connectome and two GPUs.
+
+**Can I run the fly without GLaDOS?**
+Also yes, and it is arguably the better half. `fly/moodd.py` serves a mood
+vector over HTTP to anything that wants one.
+
+**Why is it so slow?**
+It is a fly brain on two of the cheapest GPUs Nvidia makes: 0.22× realtime. The
+fly is not in a hurry, and neither is the doorbell.
+
+**Why a fruit fly?**
+Because it is about the largest completely mapped brain that still fits on
+hardware you can own. The 302-neuron worm is mapped too, and would run far
+faster, and has nothing in it that reads like a mood.
+
+---
+
 ## What this is not
 
 Stated here rather than buried, because this project is unusually easy to
 oversell and the measured version is more interesting than the hype:
 
-- **It is not a trained model.** The language organ is `qwen2.5:7b-instruct`.
-  We contributed a persona, a sampling band, device placement, and a state.
+- **It is not a trained model.** The language organ is `qwen2.5:7b-instruct`,
+  or whatever you swap in. We contributed a persona, a sampling band, device
+  placement, and a state.
 - **It is not a fly that learned English.** Connectome weights are synapse
   counts. Nothing here is trained, fine-tuned, or back-propagated.
 - **It is not reproducible output.** Same doorbell, different line, by design.

@@ -288,6 +288,22 @@ def _append_clause(body, phrase):
     Returns the key we touched, or None if there was no system message to
     append to - in which case we leave the body alone rather than inventing
     one. /api/generate nodes that pass no `system` keep their exact prompt.
+
+    An EMPTY system string counts as "none", and that distinction is not
+    pedantry - it is a measured bug this guard exists to stop. `ollama run
+    <tag>` sends /api/generate with `"system": ""`, meaning "I have no prompt
+    of my own, use the model's". A request-level system prompt OVERRIDES the
+    Modelfile's at the backend, so appending to "" turned her whole persona
+    into the four words of the clause. Measured on a probe model whose SYSTEM
+    was "always answer with exactly the single word BANANA": direct to the
+    backend, "BANANA"; through a coupling that appended to the empty string,
+    "The capital of France is Paris." The persona was gone and the only
+    symptom was a GLaDOS who answered helpfully.
+
+    So a terminal `ollama run` gets her persona and no state clause, which is
+    the right way round: a mood is an addition to who she is, never a
+    replacement for it. Clients that send their own system message - every
+    n8n node, every OpenAI-compatible SDK - are unaffected.
     """
     clause = "\nCurrent state: %s." % phrase
     msgs = body.get("messages")
@@ -295,12 +311,13 @@ def _append_clause(body, phrase):
         for i in range(len(msgs) - 1, -1, -1):
             m = msgs[i]
             if isinstance(m, dict) and m.get("role") == "system" \
-                    and isinstance(m.get("content"), str):
+                    and isinstance(m.get("content"), str) and m["content"].strip():
                 m["content"] = m["content"] + clause
                 return "messages[%d].content" % i
         return None
-    if isinstance(body.get("system"), str):
-        body["system"] = body["system"] + clause
+    sys_prompt = body.get("system")
+    if isinstance(sys_prompt, str) and sys_prompt.strip():
+        body["system"] = sys_prompt + clause
         return "system"
     return None
 
