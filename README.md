@@ -51,6 +51,14 @@ ollama run jais/GLaDOS
 
 **<https://ollama.com/jais/GLaDOS>**
 
+> **If you pulled her before 8 October 2026, re-pull.** The first upload carried
+> this host's `num_gpu 0` and `num_thread 10` inside the manifest — placement
+> fitted to one 2013 Xeon, shipped to the whole internet, quietly forcing
+> **CPU-only inference on every puller's machine** however good their GPU was.
+> The published tag is now built from the portable [`Modelfile`](Modelfile):
+> same weights blob, same persona, three parameters instead of five.
+> [`docs/HONESTY.md`](docs/HONESTY.md) has the before/after blobs.
+
 <details>
 <summary>Or build her from this repo instead, which is the same model</summary>
 
@@ -71,8 +79,12 @@ ollama run glados
 > hard way, so you don't have to.
 
 To publish your own copy under your own namespace,
-`./publish-to-ollama.sh <your-ollama.com-username>`. That needs one thing only
-the account owner can do: an unauthorised push prints a
+`./publish-to-ollama.sh <your-ollama.com-username>`. It builds the published tag
+from the portable `Modelfile` rather than copying your local one whenever the
+local one pins device placement, and it reads the uploaded parameters back *out
+of the registry* afterwards — both of those guards exist because the first
+publication did neither. That needs one thing only the account owner can do: an
+unauthorised push prints a
 `https://ollama.com/connect?…` link, and a signed-in human clicks it once to
 register the machine. The script tells you so and exits non-zero rather than
 reporting a publication that did not happen — `ollama push` prints that link and
@@ -191,7 +203,7 @@ half nobody can download.
 | part of her | what it is | ours? |
 |---|---|---|
 | **who she is** | a 164,587-neuron simulation of a real fly connectome, continuously running, membrane potentials persisting between requests, never reset | **yes** |
-| **what she senses** | her own traffic → the fly's auditory nerve; doorbell and motion → its mechanosensory nerve | **yes** |
+| **what she senses** | her own traffic → the fly's auditory nerve. The mechanosensory nerve is measured and waiting; the doorbell is not wired to it yet | **yes** |
 | **how mood reaches words** | state → one appended clause + a temperature nudge | **yes** |
 | **that she is GLaDOS at all** | `Modelfile` — the persona, the sampling band | **yes** |
 | **how she speaks** | `qwen2.5:7b-instruct`, ~7.6 × 10⁹ parameters someone else fitted on ~10¹³ tokens — *or whatever you point `byom.sh` at* | **no** |
@@ -296,6 +308,35 @@ auditory nerve on, and it happens to be the most GLaDOS thing in the entire
 project. (The magnitude is tiny and the effect is not monotonic;
 [docs/HONESTY.md](docs/HONESTY.md) holds that claim to its actual size before
 you quote it at a party.)
+
+### And the nerve we have not wired yet is five times better
+
+The same probe, pointed at the mechanosensory nerve — what a fly feels with —
+before anything was connected to it
+([`mechanosensory.json`](measurements/raw/mechanosensory.json)):
+
+| drive | 0 | 0.05 | 0.20 | 0.40 |
+|---|--:|--:|--:|--:|
+| **arousal** | 0.000 | 0.531 | 0.775 | **1.000** |
+| agitation *(inverted)* | 0.824 | 0.601 | 0.109 | 0.019 |
+
+**213 standard deviations** at full drive, against hearing's 40, and `agitation`
+sweeps monotonically from coiled-and-undisturbed to maximally driven — a second
+genuinely clean axis, which hearing never delivered. The probe also rates
+`valence` usable at 9.0 sd, but it is still not monotonic across drive
+(+0.006, +0.011, −0.006, +0.011, +0.001), so by this project's own rule it has
+earned a measurement and not yet a phrase.
+
+Two things fell out of measuring it that we would otherwise have inherited as
+assumptions. **`reinforcement` is exactly 0.0000 at every drive level on this
+site** — the plan said mechanosensory would drive novelty, valence *and*
+reinforcement, and for reinforcement that is simply false; hearing is actually
+the better of the two there, and still too weak to earn a phrase. And **the
+rescaling span below will have to be re-fitted per site, not globally**: a span
+fitted to hearing's ceiling turns mechanosensory's 0.531 at drive 0.05 into 2.79
+and clips, so the gentlest knock would pin her at maximum alert and every louder
+event would be indistinguishable from it. One global span cannot serve both
+nerves; fit it to touch and being spoken to stops moving her at all.
 
 ### The rescaling that stopped it all being theatre
 
@@ -413,7 +454,7 @@ scars.
    most 0.3, never past 0.9. A caller that chose 0.2 chose determinism and
    keeps its floor.
 
-90 checks, 0 failures, against the live fly and real sockets
+98 checks, 0 failures, against the live fly and real sockets
 ([`server/test_mood.py`](server/test_mood.py)).
 
 One deliberate exception to fail-open: a request whose *only* content is audio
@@ -563,11 +604,15 @@ oversell and the measured version is more interesting than the hype:
   The event log records the raw vector, the rescaled vector, the chosen phrase
   and the effective temperature for every single request, so *"why did she say
   that"* always has an answer.
-- **It is not finished.** Only `arousal` is usefully driven today. `novelty`,
-  `valence` and `reinforcement` are waiting on the mechanosensory nerve — which
-  measures a 40× stronger path into the escape circuit than hearing does
-  (9.4 × 10⁻² against 2.4 × 10⁻³) and is blocked on a home-automation
-  credential, not on physics.
+- **It is not finished.** Only `arousal` is usefully driven today. The
+  mechanosensory nerve is now measured and it is five times the sense hearing
+  is — **213 standard deviations** of arousal at full drive against hearing's
+  40 — and it adds `agitation` as a second cleanly monotonic axis. It waits on
+  a door sensor rather than on physics. `reinforcement` is a different story:
+  it reads **exactly
+  0.0000 at every drive level** on that site, so the plan's promise that
+  mechanosensory would drive it is withdrawn here rather than quietly
+  inherited.
 - **It is not a simulated fly having experiences.** It is a sparse matrix being
   multiplied, and we have no idea what, if anything, that is like. We are
   careful about this claim in both directions.

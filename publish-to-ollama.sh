@@ -66,8 +66,45 @@ ollama list | awk '{print $1}' | grep -qi "^$SOURCE" || {
   exit 1
 }
 
-echo "tagging  $SOURCE -> $TARGET"
-ollama cp "$SOURCE" "$TARGET"
+# DO NOT publish the local tag blindly. The deployed `glados` pins device
+# placement to the host it runs on, and those parameters travel inside the
+# manifest: the first upload of jais/GLaDOS shipped `num_gpu 0` and
+# `num_thread 10` to the whole internet, which silently forced CPU-only
+# inference on every puller's machine, however good their GPU was. The symptom
+# is "it works, but slowly", i.e. no symptom at all.
+#
+# So: if the source tag carries placement, build the published tag from the
+# portable ./Modelfile instead of copying it. Rebuild rather than warn, for the
+# same reason byom.sh renames rather than warns — a printed caution scrolls past
+# and the bad artifact still ships.
+PLACEMENT_RE='^(num_gpu|num_thread|main_gpu|low_vram|num_batch)[[:space:]]'
+offenders="$(ollama show "$SOURCE" --parameters 2>/dev/null \
+             | grep -E "$PLACEMENT_RE" | awk '{print $1}' | paste -sd, -)"
+
+if [[ -n "$offenders" ]]; then
+  if [[ -r Modelfile ]]; then
+    echo "note     '$SOURCE' pins host-specific placement ($offenders)"
+    echo "building $TARGET from ./Modelfile instead of copying '$SOURCE'"
+    ollama create "$TARGET" -f Modelfile
+  else
+    echo "'$SOURCE' pins host-specific placement ($offenders) and ./Modelfile" >&2
+    echo "is not readable, so there is no portable build to publish instead." >&2
+    echo "Run this from a checkout of the repository." >&2
+    exit 1
+  fi
+else
+  echo "tagging  $SOURCE -> $TARGET"
+  ollama cp "$SOURCE" "$TARGET"
+fi
+
+# Belt and braces: whatever route we took, the thing about to be uploaded must
+# not carry placement.
+still="$(ollama show "$TARGET" --parameters 2>/dev/null \
+         | grep -E "$PLACEMENT_RE" | awk '{print $1}' | paste -sd, -)"
+if [[ -n "$still" ]]; then
+  echo "refusing to push: $TARGET still pins $still" >&2
+  exit 1
+fi
 
 echo "pushing  $TARGET (~4.7 GB on a first push; later pushes reuse blobs)"
 # `ollama push` prints the connect link and still exits 0 when this machine is
@@ -101,7 +138,33 @@ fi
 
 # Trust the registry rather than our own stdout: ask it whether the manifest
 # actually landed.
-if curl -fsS -o /dev/null "https://registry.ollama.ai/v2/$USERNAME/$PUBLISHED/manifests/latest" 2>/dev/null; then
+MANIFEST="$(curl -fsS "https://registry.ollama.ai/v2/$USERNAME/$PUBLISHED/manifests/latest" 2>/dev/null || true)"
+if [[ -n "$MANIFEST" ]]; then
+  # And read back the parameters the registry will hand to strangers, rather
+  # than the ones we believe we uploaded. This is the check that would have
+  # caught the num_gpu 0 publication.
+  blob="$(printf '%s' "$MANIFEST" | python3 -c '
+import json, sys
+try:
+    m = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+for l in m.get("layers", []):
+    if l.get("mediaType", "").endswith("params"):
+        print(l["digest"])
+        break
+')"
+  if [[ -n "$blob" ]]; then
+    served="$(curl -fsSL "https://registry.ollama.ai/v2/$USERNAME/$PUBLISHED/blobs/$blob" 2>/dev/null || true)"
+    echo
+    echo "registry serves these parameters: $served"
+    if grep -qE '"(num_gpu|num_thread|main_gpu|low_vram)"' <<<"$served"; then
+      echo >&2
+      echo "WARNING: the published model pins device placement. Every puller" >&2
+      echo "inherits it. Rebuild from ./Modelfile and push again." >&2
+      exit 1
+    fi
+  fi
   cat <<TXT
 
 Done, and verified against the registry. Anyone can now run her with:

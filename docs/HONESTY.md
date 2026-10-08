@@ -217,6 +217,49 @@ repository is about is silently absent. Fifteen routing cases now pin it in
 real socket — `jais/GLaDOS` logging `mood_applied: true`, with
 `qwen2.5:7b-instruct` still logging `model_not_coupled` in the same minute.
 
+## The second defect publishing turned up: we shipped our own hardware
+
+The same shape a third time — an artifact that works, with no symptom worth
+noticing — and this one was live on the internet for about two hours before
+anybody looked at the manifest instead of the model.
+
+`publish-to-ollama.sh` did `ollama cp glados jais/GLaDOS`, and the local
+`glados` is the **deployed** build. Device placement is fitted to this host in
+[`Modelfile.cpu-tuned`](../Modelfile.cpu-tuned), and the portable
+[`Modelfile`](../Modelfile) says in a comment that those numbers "would
+actively hurt you". Parameters travel inside the manifest, so the publication
+shipped them anyway. Read straight back out of the registry:
+
+| | parameters the registry served |
+|---|---|
+| before | `{"num_gpu":0,"num_predict":100,"num_thread":10,...}` |
+| after | `{"num_predict":100,"stop":["</s>"],"temperature":0.7}` |
+
+`num_gpu 0` means **do not use the GPU**. Every puller, on any machine, was
+getting CPU-only inference with their accelerator idle, plus a thread count
+fitted to a 2013 Xeon whose cgroup straddles two NUMA nodes. Nothing errors.
+She answers in character. She is simply slow, on hardware its owner bought
+specifically so that she would not be — and "an LLM feels slow" is close to the
+least likely symptom on earth to get reported as a bug.
+
+Fixed by rebuilding the published tag from the portable `Modelfile` and pushing
+again. The model, system, template and license layers are **byte-identical**
+across the fix (same `sha256:2bada8a7…` weights blob); only the 92-byte params
+layer changed. Verified by deleting the local tag, pulling the published one
+back down, and reading the parameters off *that* copy — then talking to it
+through the live coupling, which logged `mood_applied: true`.
+
+Two guards so it cannot recur, both in `publish-to-ollama.sh`:
+
+1. If the source tag pins `num_gpu`, `num_thread`, `main_gpu`, `low_vram` or
+   `num_batch`, the published tag is **rebuilt from `./Modelfile`** instead of
+   copied — rebuild rather than warn, for the same reason `byom.sh` renames
+   rather than warns.
+2. After the push it fetches the params layer **from the registry** and fails
+   if placement is present. Checking what we meant to upload is not the same as
+   checking what a stranger receives, and only the second one would have caught
+   this.
+
 ## `agitation` is inverted
 
 1.0 is undisturbed and coiled. 0.0 is maximally driven. A resting value of 0.85
@@ -235,6 +278,7 @@ publishing measurements.
 |---|---|
 | "The two T400s do 13.5 tok/s on the 7B, against 0.5 on the CPU." | **Withdrawn.** Does not reproduce. Three reps, variance under 0.03, full 29/29 offload confirmed in the loader log: **7.06 tok/s**, which is within noise of the tuned CPU's 7.39. The 0.5 figure was the *untuned* CPU default, since measured at 1.35–1.54. |
 | "Full GPU offload is the fast path for the language model." | **Withdrawn.** A T400 is a 64-bit-bus card and decode is bandwidth-bound. Flash attention changes nothing at these context lengths (7.42 vs 7.06, i.e. a no-op). The text model stays on the CPU, which also leaves both cards free for the fly. |
+| "Mechanosensory is the axis that would drive novelty, valence and reinforcement properly." | **Withdrawn for `reinforcement`.** Measured on the live engine before wiring: reinforcement is **exactly 0.0000** at every drive level from 0.02 to 0.40 ([`mechanosensory.json`](../measurements/raw/mechanosensory.json)). Hearing is the better of the two there (0.006–0.018) and still too weak to earn a phrase. Arousal (213 sd) and agitation (monotonic, 0.823 → 0.019) hold up; valence is rated usable at 9.0 sd but is still not monotonic. |
 | "More threads are faster." | **Withdrawn, emphatically.** 10 threads: 8.18 tok/s. 20 threads (Ollama's own default on this box): **1.54 tok/s**. The cgroup straddles two NUMA nodes with only 10 full physical cores, so every extra thread buys cross-socket memory traffic. Raising it is not a free win; it collapses. |
 
 ---

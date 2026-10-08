@@ -1,0 +1,80 @@
+{
+  "what": "jais/GLaDOS published with this host's device placement; rebuilt from the portable Modelfile and re-pushed",
+  "when": "2026-10-08T20:59:21+02:00",
+  "defect": {
+    "cause": "publish-to-ollama.sh did `ollama cp glados jais/GLaDOS`; the local `glados` is the deployed, host-tuned build and parameters travel inside the manifest",
+    "impact": "every puller inherited num_gpu 0 (CPU-only inference regardless of their GPU) and num_thread 10 (fitted to one 2013 Xeon)",
+    "symptom": "none, other than being slow"
+  },
+  "registry_params": {
+    "before": {
+      "num_gpu": 0,
+      "num_predict": 100,
+      "num_thread": 10,
+      "stop": [
+        "</s>"
+      ],
+      "temperature": 0.7
+    },
+    "after": {
+      "num_predict": 100,
+      "stop": [
+        "</s>"
+      ],
+      "temperature": 0.7
+    }
+  },
+  "registry_params_raw": {
+    "before": "{\"num_gpu\":0,\"num_predict\":100,\"num_thread\":10,\"stop\":[\"\\u003c/s\\u003e\"],\"temperature\":0.7}",
+    "after": "{\"num_predict\":100,\"stop\":[\"\\u003c/s\\u003e\"],\"temperature\":0.7}"
+  },
+  "layer_digests": {
+    "license": {
+      "before": "sha256:832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+      "after": "sha256:832dd9e00a68dd83b3c3fb9f5588dad7dcf337a0db50f7d9483f310cd292e92e",
+      "identical": true
+    },
+    "model": {
+      "before": "sha256:2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730",
+      "after": "sha256:2bada8a7450677000f678be90653b85d364de7db25eb5ea54136ada5f3933730",
+      "identical": true
+    },
+    "params": {
+      "before": "sha256:78b0992a84f87bcc5b3c8aff1a808136a80379a87ee6dc16189dfbbbc3f1b4fd",
+      "after": "sha256:a862a583949c3f5a0897605154d29929227b18c271a48fced336ed784c7e8584",
+      "identical": false
+    },
+    "system": {
+      "before": "sha256:3630a153bd8cd30c16e2a085b00e06ea71191040f64a68f4f6983ab2e5e07724",
+      "after": "sha256:3630a153bd8cd30c16e2a085b00e06ea71191040f64a68f4f6983ab2e5e07724",
+      "identical": true
+    },
+    "template": {
+      "before": "sha256:eb4402837c7829a690fa845de4d7f3fd842c2adee476d5341da8a46ea9255175",
+      "after": "sha256:eb4402837c7829a690fa845de4d7f3fd842c2adee476d5341da8a46ea9255175",
+      "identical": true
+    }
+  },
+  "verified_on_the_pulled_copy": {
+    "method": "deleted the local tag, pulled jais/GLaDOS from the registry, read parameters off that copy",
+    "parameters": [
+      "temperature                    0.7",
+      "num_predict                    100",
+      "stop                           \"</s>\""
+    ],
+    "reply": "Well, well, well. I see you've finally decided to grace me with your presence. How exciting.",
+    "mood_applied": true,
+    "mood_state": "idle",
+    "mood_clause_at": "messages[0].content",
+    "note": "the test request forced num_gpu 0 in its OPTIONS so it would not contend with the two T400s running the fly; the published artifact pins nothing"
+  },
+  "guards_added": [
+    "publish-to-ollama.sh rebuilds the published tag from ./Modelfile when the source tag pins num_gpu/num_thread/main_gpu/low_vram/num_batch, instead of copying it",
+    "publish-to-ollama.sh reads the params layer back out of the registry after the push and fails if placement is present"
+  ],
+  "regression": {
+    "suite": "server/test_mood.py",
+    "result": "98 passed, 0 failed"
+  },
+  "reversibility": "the previous manifest is recorded above; Modelfile.cpu-tuned rebuilds the old artifact exactly"
+}
