@@ -138,6 +138,21 @@ scroll past, because a silently-uncoupled GLaDOS is the most disappointing
 possible outcome: she still answers in character, she just has no moods, for
 ever.
 
+**Namespaces are stripped before the fence is checked**, and that detail very
+nearly shipped broken. A model pulled from a registry keeps its namespace —
+`jais/GLaDOS:latest`, or `hf.co/user/repo:Q4_K_M` — and the original check
+compared the whole string, so the *published* GLaDOS would have failed her own
+name test on every machine that pulled her. Everybody downstream would have got
+the persona and no fly, and nothing would have looked wrong, because the only
+symptom is a GLaDOS who is never in a mood. The comparison now runs on the part
+after the last `/`.
+
+Stripping is the narrow direction, not the broad one: matching the whole string
+*also* coupled `glados/qwen2.5:7b-instruct` — somebody else's ordinary model,
+sitting in a namespace that happens to be spelled `glados`. The tag is still not
+stripped, so `glados:v2` matches and `jais/not-glados` does not. Fifteen routing
+cases pin it in [`server/test_mood.py`](server/test_mood.py).
+
 ### Proof, with a control arm that is the same weights under a different name
 
 "It is coupled" is exactly the kind of claim that quietly isn't, so

@@ -272,8 +272,22 @@ live_cfg.pop("mood_models")          # fall back to the module default
 live_cfg.pop("mood_axis_span")
 for tag, want in (("qwen2.5:7b-instruct", False), ("qwen2.5:7b", False),
                   ("moondream", False), ("glados", True),
-                  ("glados:latest", True), ("GLaDOS", True), ("", False)):
-    check("default routing: %-20s coupled=%s" % (repr(tag), want),
+                  ("glados:latest", True), ("GLaDOS", True), ("", False),
+                  # A registry pull keeps its namespace. These are the names
+                  # the PUBLISHED model actually has on someone else's machine,
+                  # so if they do not couple, nobody who pulls her ever gets a
+                  # mood - and she still answers in character, so nobody finds
+                  # out. The published tag is `jais/GLaDOS`; both spellings and
+                  # a Hugging Face GGUF path have to land.
+                  ("jais/GLaDOS", True), ("jais/GLaDOS:latest", True),
+                  ("jais/glados", True), ("hf.co/jais/glados:Q4_K_M", True),
+                  ("registry.example.com/x/glados-big", True),
+                  # ...without turning the fence into "couple everything":
+                  # a namespace that merely CONTAINS the word must not match,
+                  # or n8n's tag could be re-coupled by someone else's naming.
+                  ("glados/qwen2.5:7b-instruct", False),
+                  ("jais/not-glados", False), ("jais/", False)):
+    check("default routing: %-24s coupled=%s" % (repr(tag), want),
           mood.model_coupled(tag, live_cfg) is want)
 
 reset_cache()

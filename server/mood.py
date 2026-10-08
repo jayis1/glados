@@ -238,12 +238,27 @@ def model_coupled(model, cfg):
 
     An empty prefix list means "couple nothing", not "couple everything": the
     failure mode of a mis-typed config should be today's behaviour.
+
+    The prefix is matched against the *bare* model name - everything after the
+    last `/` - because a registry pull keeps its namespace: `ollama pull
+    jais/GLaDOS` lands locally as `jais/GLaDOS:latest`, and a Hugging Face GGUF
+    as `hf.co/user/repo:Q4`. Matching the literal string would uncouple the
+    published model for every single person who pulls it, and the symptom is a
+    GLaDOS who still answers in character and merely never has a mood again -
+    the hardest kind of failure to notice here.
+
+    Stripping is the conservative direction, not the broad one. Matching the
+    whole string would also couple `glados/qwen2.5:7b-instruct` - the n8n tag,
+    sitting in a namespace that happens to be spelled `glados` - which IST-280
+    forbids outright. Every tag coupled today is bare (`glados`, `glados:latest`,
+    `glados-llama3.1`), so for those this is the same comparison it always was.
+    The tag is deliberately NOT stripped: `glados:v2` still matches `glados`.
     """
     prefixes = cfg.get("mood_models")
     if prefixes is None:
         prefixes = ("glados",)
-    m = (model or "").lower()
-    return any(m.startswith(str(p).lower()) for p in prefixes)
+    bare = (model or "").lower().rsplit("/", 1)[-1]
+    return any(bare.startswith(str(p).lower()) for p in prefixes)
 
 
 def classify(mood, cfg):

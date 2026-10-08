@@ -184,6 +184,39 @@ state clause**. Send a system message of your own — every n8n node and every
 OpenAI-compatible SDK does — and the coupling applies in full. See
 [BYOM.md](BYOM.md).
 
+## The defect publishing turned up: the published model failed her own name test
+
+Same shape as the BANANA incident — caught before anyone could hit it, but only
+because the publication step forced us to say the model's real name out loud.
+
+The fly-to-model coupling is fenced by name prefix: anything called `glados*`
+gets the fly. The check compared the **whole** model string. A model pulled from
+a registry keeps its namespace, so the moment she went out as `jais/GLaDOS`,
+every machine that pulled her would have asked "does `jais/glados` start with
+`glados`?", got **no**, and run her uncoupled. Measured on the live service
+before the fix:
+
+| model string | coupled, before | coupled, after |
+|---|---|---|
+| `glados`, `glados:latest`, `GLaDOS` | yes | yes |
+| `jais/GLaDOS`, `jais/GLaDOS:latest` | **no** | yes |
+| `hf.co/user/glados:Q4_K_M` | **no** | yes |
+| `glados/qwen2.5:7b-instruct` | **yes** | no |
+| `qwen2.5:7b-instruct`, `jais/not-glados` | no | no |
+
+Note the fourth row. Comparing the whole string was not merely too strict, it was
+also too loose in the other direction: it coupled somebody else's ordinary model
+because the *namespace* happened to be spelled `glados`. Matching the part after
+the last `/` fixes both, and is the same comparison it always was for every tag
+that already worked, since those have no `/` in them.
+
+The symptom, had it shipped, would have been the worst kind again: she still
+answers in character, she simply never has a mood, and the one thing this whole
+repository is about is silently absent. Fifteen routing cases now pin it in
+[`test_mood.py`](../server/test_mood.py), and the fix was verified through the
+real socket — `jais/GLaDOS` logging `mood_applied: true`, with
+`qwen2.5:7b-instruct` still logging `model_not_coupled` in the same minute.
+
 ## `agitation` is inverted
 
 1.0 is undisturbed and coiled. 0.0 is maximally driven. A resting value of 0.85
