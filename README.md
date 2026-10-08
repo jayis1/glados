@@ -59,6 +59,19 @@ ollama run glados
 > `ollama create -f -` does not read stdin — it wants a real path. Verified the
 > hard way, so you don't have to.
 
+<details>
+<summary>Or publish her to the Ollama registry, so there is nothing to clone at all</summary>
+
+`./publish-to-ollama.sh <your-ollama.com-username>` tags and pushes her, after
+which she is a plain `ollama run <namespace>/glados` for anyone.
+
+That needs one thing only the account owner can do: the registry authenticates
+pushes with your machine's Ollama public key, which has to be registered at
+<https://ollama.com/settings/keys> by hand. Run the script with **no arguments**
+and it prints the exact key to paste.
+
+</details>
+
 Then she is simply a model. `ollama list` shows her, `ollama run glados` talks
 to her, and `"model": "glados"` works anywhere a model name goes:
 
