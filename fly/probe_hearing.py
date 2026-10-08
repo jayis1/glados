@@ -95,7 +95,12 @@ def main():
     ap.add_argument("--site", default="hearing_JO")
     ap.add_argument("--levels", default="0.02,0.05,0.1,0.2,0.4")
     ap.add_argument("--settle", type=float, default=11.0)
+    # The output path used to be hardcoded to hearing.json, which meant probing
+    # any OTHER site silently overwrote the hearing measurement that IST-280
+    # and MOOD.md both cite. Default unchanged; name it when probing elsewhere.
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    out_path = args.out or OUT
     levels = [float(x) for x in args.levels.split(",") if x.strip()]
 
     h = call("/health")
@@ -161,13 +166,13 @@ def main():
                           for a, v in best.items()}
     usable = [a for a, v in results["verdict"].items() if v["usable"]]
     results["usable_axes"] = usable
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w") as fh:
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, "w") as fh:
         json.dump(results, fh, indent=1)
     print("\nverdict: %s drives %s" % (args.site, usable or "NOTHING above noise"))
     for a, v in sorted(results["verdict"].items(), key=lambda kv: -kv[1]["max_sigma"]):
         print("   %-14s %6.1f sd at drive %s" % (a, v["max_sigma"], v["at_level"]))
-    print("wrote %s" % OUT)
+    print("wrote %s" % out_path)
     return 0 if usable else 1
 
 

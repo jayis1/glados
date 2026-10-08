@@ -1,0 +1,49 @@
+live engine: connectome-lif  164587 neurons  4.762 ms/step  0.210x realtime
+noise floor (normalised, 1 sd): arousal 0.0047  novelty 0.0016  valence 0.0021  reinforcement 0.0019  agitation 0.0732
+
+-- rest (drive 0) --
+   arousal 0.0000  novelty 0.0552  valence 0.0127  reinforcement 0.0000  agitation 0.8235
+
+-- mechanosensory = 0.020 --
+   arousal        0.0741  d=+0.0741    15.8 sd  MOVED
+   novelty        0.0601  d=+0.0050     3.0 sd  MOVED
+   valence        0.0059  d=-0.0068     3.3 sd  MOVED
+   reinforcement  0.0000  d=+0.0000     0.0 sd       
+   agitation      0.7222  d=-0.1012     1.4 sd       
+
+-- mechanosensory = 0.050 --
+   arousal        0.5310  d=+0.5310   113.1 sd  MOVED
+   novelty        0.0487  d=-0.0064     3.9 sd  MOVED
+   valence        0.0113  d=-0.0014     0.7 sd       
+   reinforcement  0.0000  d=+0.0000     0.0 sd       
+   agitation      0.6010  d=-0.2225     3.0 sd  MOVED
+
+-- mechanosensory = 0.100 --
+   arousal        0.5894  d=+0.5894   125.6 sd  MOVED
+   novelty        0.0456  d=-0.0095     5.8 sd  MOVED
+   valence        -0.0060  d=-0.0187     9.0 sd  MOVED
+   reinforcement  0.0000  d=+0.0000     0.0 sd       
+   agitation      0.4820  d=-0.3415     4.7 sd  MOVED
+
+-- mechanosensory = 0.200 --
+   arousal        0.7751  d=+0.7751   165.1 sd  MOVED
+   novelty        0.0505  d=-0.0047     2.8 sd       
+   valence        0.0107  d=-0.0020     1.0 sd       
+   reinforcement  0.0000  d=+0.0000     0.0 sd       
+   agitation      0.1085  d=-0.7150     9.8 sd  MOVED
+
+-- mechanosensory = 0.400 --
+   arousal        1.0000  d=+1.0000   213.1 sd  MOVED
+   novelty        0.0429  d=-0.0122     7.4 sd  MOVED
+   valence        0.0009  d=-0.0118     5.7 sd  MOVED
+   reinforcement  0.0000  d=+0.0000     0.0 sd       
+   agitation      0.0191  d=-0.8043    11.0 sd  MOVED
+
+drive returned to 0
+
+verdict: mechanosensory drives ['arousal', 'novelty', 'valence', 'agitation']
+   arousal         213.1 sd at drive 0.4
+   agitation        11.0 sd at drive 0.4
+   valence           9.0 sd at drive 0.1
+   novelty           7.4 sd at drive 0.4
+wrote /opt/paperclip-glados/measurements/mechanosensory.json

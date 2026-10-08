@@ -1,0 +1,205 @@
+{
+ "site": "mechanosensory",
+ "levels": {
+  "0.02": {
+   "mood": {
+    "arousal": 0.07405999999999999,
+    "novelty": 0.06013999999999999,
+    "valence": 0.00592,
+    "reinforcement": 0.0,
+    "agitation": 0.72224
+   },
+   "jitter": {
+    "arousal": 0.1855,
+    "novelty": 0.009299999999999996,
+    "valence": 0.005599999999999999,
+    "reinforcement": 0.0,
+    "agitation": 0.024399999999999977
+   },
+   "delta": {
+    "arousal": 0.07405999999999999,
+    "novelty": 0.004979999999999991,
+    "valence": -0.00676,
+    "reinforcement": 0.0,
+    "agitation": -0.10124
+   },
+   "sigma": {
+    "arousal": 15.779569950248751,
+    "novelty": 3.028623826322926,
+    "valence": 3.2640034858934173,
+    "reinforcement": 0.0,
+    "agitation": 1.3830601092896173
+   }
+  },
+  "0.05": {
+   "mood": {
+    "arousal": 0.53102,
+    "novelty": 0.04874,
+    "valence": 0.011300000000000001,
+    "reinforcement": 0.0,
+    "agitation": 0.601
+   },
+   "jitter": {
+    "arousal": 0.04469999999999996,
+    "novelty": 0.003599999999999999,
+    "valence": 0.006600000000000001,
+    "reinforcement": 0.0,
+    "agitation": 0.04910000000000003
+   },
+   "delta": {
+    "arousal": 0.53102,
+    "novelty": -0.006420000000000002,
+    "valence": -0.0013799999999999993,
+    "reinforcement": 0.0,
+    "agitation": -0.22248
+   },
+   "sigma": {
+    "arousal": 113.14160457711442,
+    "novelty": 3.9043704748982377,
+    "valence": 0.6663202382445138,
+    "reinforcement": 0.0,
+    "agitation": 3.039344262295082
+   }
+  },
+  "0.1": {
+   "mood": {
+    "arousal": 0.58936,
+    "novelty": 0.04562,
+    "valence": -0.006,
+    "reinforcement": 0.0,
+    "agitation": 0.48202
+   },
+   "jitter": {
+    "arousal": 0.0012999999999999678,
+    "novelty": 0.009299999999999996,
+    "valence": 0.01,
+    "reinforcement": 0.0,
+    "agitation": 0.03600000000000003
+   },
+   "delta": {
+    "arousal": 0.58936,
+    "novelty": -0.00954,
+    "valence": -0.018680000000000002,
+    "reinforcement": 0.0,
+    "agitation": -0.34146
+   },
+   "sigma": {
+    "arousal": 125.57179781094526,
+    "novelty": 5.801821546811398,
+    "valence": 9.019465253918497,
+    "reinforcement": 0.0,
+    "agitation": 4.664754098360656
+   }
+  },
+  "0.2": {
+   "mood": {
+    "arousal": 0.7750999999999999,
+    "novelty": 0.050480000000000004,
+    "valence": 0.01068,
+    "reinforcement": 0.0,
+    "agitation": 0.10848
+   },
+   "jitter": {
+    "arousal": 0.025499999999999967,
+    "novelty": 0.005999999999999998,
+    "valence": 0.0077,
+    "reinforcement": 0.0,
+    "agitation": 0.08100000000000002
+   },
+   "delta": {
+    "arousal": 0.7750999999999999,
+    "novelty": -0.004679999999999997,
+    "valence": -0.002,
+    "reinforcement": 0.0,
+    "agitation": -0.715
+   },
+   "sigma": {
+    "arousal": 165.1464308457711,
+    "novelty": 2.8461766078697406,
+    "valence": 0.9656815047021944,
+    "reinforcement": 0.0,
+    "agitation": 9.76775956284153
+   }
+  },
+  "0.4": {
+   "mood": {
+    "arousal": 1.0,
+    "novelty": 0.04294,
+    "valence": 0.0009199999999999998,
+    "reinforcement": 0.0,
+    "agitation": 0.01914
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.013499999999999998,
+    "valence": 0.0189,
+    "reinforcement": 0.0,
+    "agitation": 0.0537
+   },
+   "delta": {
+    "arousal": 1.0,
+    "novelty": -0.012220000000000002,
+    "valence": -0.01176,
+    "reinforcement": 0.0,
+    "agitation": -0.8043399999999999
+   },
+   "sigma": {
+    "arousal": 213.0646766169154,
+    "novelty": 7.4316833649932175,
+    "valence": 5.678207247648903,
+    "reinforcement": 0.0,
+    "agitation": 10.988251366120217
+   }
+  }
+ },
+ "noise_floor": {
+  "arousal": 0.004693410544996031,
+  "novelty": 0.0016443111741765055,
+  "valence": 0.0020710762195003188,
+  "reinforcement": 0.0019293022718076189,
+  "agitation": 0.0732
+ },
+ "engine": {
+  "engine": "connectome-lif",
+  "neurons": 164587,
+  "edges": 24539704,
+  "ms_step": 4.762,
+  "realtime": 0.21
+ },
+ "started": "2026-10-08T20:38:36+0200",
+ "rest": {
+  "arousal": 0.0,
+  "novelty": 0.05516,
+  "valence": 0.01268,
+  "reinforcement": 0.0,
+  "agitation": 0.82348
+ },
+ "verdict": {
+  "arousal": {
+   "max_sigma": 213.1,
+   "at_level": "0.4",
+   "usable": true
+  },
+  "novelty": {
+   "max_sigma": 7.4,
+   "at_level": "0.4",
+   "usable": true
+  },
+  "valence": {
+   "max_sigma": 9.0,
+   "at_level": "0.1",
+   "usable": true
+  },
+  "agitation": {
+   "max_sigma": 11.0,
+   "at_level": "0.4",
+   "usable": true
+  }
+ },
+ "usable_axes": [
+  "arousal",
+  "novelty",
+  "valence",
+  "agitation"
+ ]
+}
