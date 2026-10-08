@@ -158,13 +158,33 @@ nothing, demo it confidently, and never find out. Hence the rule every input
 here has to pass: a plausible site name is not evidence. Prove the nerve moves a
 readout *before* wiring anything to it.
 
-**Touch turns out to be a far better sense than hearing, by a factor of five.**
-The mechanosensory nerve puts arousal **213 standard deviations** above the
-noise floor at full drive, against hearing's 40, and sweeps `agitation`
-monotonically from coiled to maximally driven — a second clean axis, which
-hearing never delivered. Measured before anything was wired to it, which is the
-rule. It is the one remaining input waiting on a door sensor rather than on
-physics.
+**The sense we had written off as a stand-in is the strongest nerve in the
+fly.** The plan said touch would drive novelty, valence and reinforcement, and
+treated the fly's *thermometer* as somewhere to dump temperature readings.
+Probing both before wiring either inverted it almost exactly: reinforcement is
+**exactly 0.0000** at every drive level on touch, and it is the thermometer's
+strongest axis at **218 standard deviations** — the strongest coupling anywhere
+in this animal. Touch, meanwhile, drives arousal at 213 sd against hearing's 40,
+and sweeps agitation monotonically from coiled to maximally driven. Three
+nerves, almost perfectly complementary, and nobody designed that:
+
+| nerve | drives |
+|---|---|
+| hearing — her own traffic | arousal, weakly |
+| touch — the front door | arousal hard, agitation |
+| the thermometer — the heat | novelty, valence, reinforcement |
+
+Four of the five axes now have a measured, monotonic ladder. Before this, one
+did.
+
+**And the two nerves do not behave the same way at all.** Hold touch at a
+constant drive and it climbs to a plateau in about 30 seconds and stays there.
+Hold the *thermometer* at a constant drive and it peaks at 12 seconds and is
+back at **exactly zero by 30**, with the stimulus still applied — a
+thermoreceptor answers the onset of a change and then habituates completely,
+which is what a real one does. Nobody wrote that either, and it is why her
+phrase for it reads *"an unfamiliar pattern, briefly interesting"*. A
+temperature that stops changing stops being a temperature.
 
 ⚠️ **`agitation` is inverted.** 1.0 is undisturbed and coiled; 0.0 is maximally
 driven. A resting 0.85 means *calm*. Read it the intuitive way round and you
@@ -234,7 +254,11 @@ meant to be unpredictable.
 - **Not reproducible output.** Same doorbell, different line, by design. Every
   request logs the raw vector, the rescaled vector, the chosen phrase and the
   effective temperature, so *"why did she say that"* always has an answer.
-- **Not finished.** Only `arousal` is usefully driven today.
+- **Not finished.** Four axes of five are driven. The fifth gap is honest:
+  `displeased` is a phrase she cannot reach, because raw valence has never gone
+  below −0.005 on any nerve. And her thermal sense is currently wired to
+  *machine* temperatures, because every room climate sensor in the house she
+  runs reports `unavailable`.
 - **Not a simulated fly having experiences.** It is a sparse matrix being
   multiplied, and we have no idea what, if anything, that is like. We are
   careful about this claim in both directions.

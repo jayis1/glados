@@ -73,9 +73,16 @@ from +0.010 at rest to −0.005 at drive 0.2
 
 The honest framing: the *direction* is real and reproducible, the *magnitude*
 is tiny — a span of about 0.015 against a noise floor of 0.0021 — and the
-response is **not monotonic** (it recovers to +0.003 at drive 0.4). That is
-precisely why valence is **not** in the rescaling table and does **not** drive
-her state line. It is a real finding we declined to build on.
+response is **not monotonic** (it recovers to +0.003 at drive 0.4). It is a
+real finding we declined to build on.
+
+One consequence of IST-280 worth stating here, because it makes this finding
+*harder* to see rather than easier: valence now has a rescaling span, fitted to
+hygro_thermo, which is the nerve that moves it monotonically. Rescaling clips
+at 0, and hearing's valence drift is negative, so the drift no longer appears
+in the scaled vector at all. It is still recorded on every single request as
+`mood_raw` in the event log — which is where it was always measured — but the
+state line will never show it, and `displeased` remains an unreachable phrase.
 
 Calling it "she gets annoyed when you talk to her" is a fair description of a
 measured effect in a simulated nervous system. Calling it an emotion is not
@@ -93,8 +100,8 @@ which is correctly left alone. 10/10.
 
 The caveat: "drive" means one appended clause and a temperature nudge, exactly
 as it does for the deployed model. A bigger base does not get a bigger channel.
-It renders the same five axes more fluently, and `arousal` is still the only
-one of them usefully driven today.
+It renders the same five axes more fluently — four of which now have a measured
+monotonic ladder, since IST-280 wired the door and the thermometer.
 
 What we have **not** measured: whether any particular large model is *better*
 at being her. We own a 2013 Xeon. The claim is that the swap is one command,
@@ -108,6 +115,31 @@ multiplied. We have no idea what, if anything, that is like, and this
 repository is not evidence either way.
 
 ---
+
+## The site we expected nothing from, and the one we expected everything from
+
+IST-280's plan named `mechanosensory` as "the axis that would drive novelty,
+valence and reinforcement properly", and `hygro_thermo` as a place to dump
+temperature readings, "named in the config as the stand-in it is". Probing both
+before wiring either inverted that almost exactly.
+
+| | mechanosensory | hygro_thermo |
+|---|---|---|
+| arousal | **213 sd**, 0 → 1.000 | **exactly 0.0000** at every level |
+| agitation | monotonic, 0.823 → 0.019 | unmoved |
+| novelty | 7.4 sd, non-monotonic | monotonic, 143 sd |
+| valence | 9.0 sd, non-monotonic | monotonic, 173 sd |
+| reinforcement | **exactly 0.0000** at every level | monotonic, **218 sd** |
+
+[`mechanosensory.json`](../measurements/raw/mechanosensory.json),
+[`hygro_thermo.json`](../measurements/raw/hygro_thermo.json). The throwaway site
+is the strongest coupling in this fly, and it is the only thing that moves the
+axis which was dead everywhere else. The predicted site drives the two axes the
+plan did not ask it for.
+
+Neither of those is a result we would have had if we had wired first. The
+withdrawal is recorded in the table at the bottom of this file; the reason it
+was catchable at all is the rule below.
 
 ## The dead input, which is why we measure first
 
@@ -259,6 +291,64 @@ Two guards so it cannot recur, both in `publish-to-ollama.sh`:
    if placement is present. Checking what we meant to upload is not the same as
    checking what a stranger receives, and only the second one would have caught
    this.
+
+## The phantom knock, caught by a test rather than by a doorbell
+
+Worth recording because the bug was invisible from the outside and the test
+that found it was written to check something slightly different.
+
+Home Assistant's `/api/history/period` returns, for each entity, the state at
+the **start of the window** as the first element, then the changes inside it. A
+real response makes that obvious — the first point's `last_changed` is exactly
+the `since` you asked for — but the ingest counted every `on` it saw, including
+that first one. An indoor occupancy sensor is `on` for most of the day, so the
+sense would have invented a knock on every service restart, and then a second
+one on the next poll whose window happened to open while it was still on.
+
+The symptom would have been a GLaDOS who is mildly alarmed for no reason, which
+in this project reads as working correctly. Fixed by treating the first point of
+each series as the baseline and never as an event; six counting cases in
+[`test_ha_senses.py`](../server/test_ha_senses.py) pin it, including
+off→on→off within one window (one event, not two) and already-on-and-reported-
+repeatedly (no event).
+
+## What one door event does, and the wrong explanation we reached for first
+
+The config comment originally claimed a single door sensor firing "reads
+`stirring`". Measured, the same 0.02 drive into mechanosensory gave raw arousal
+**0.0629** and then **0.0275** — either side of the threshold once rescaled, so
+the state came out `stirring` once and `idle` once.
+
+The first explanation was the obvious one: it is a continuously running network,
+so the same stimulus lands differently depending on its trajectory, like the
+drift that moved the arousal ceiling from 0.19 to 0.3493. **That explanation was
+wrong, and measuring instead of believing it changed the answer.** Driving one
+site at a constant level and sampling every 6 s for 72 s
+([`rise_time.json`](../measurements/raw/rise_time.json)):
+
+| | 6 s | 12 s | 24 s | 30 s | 72 s |
+|---|--:|--:|--:|--:|--:|
+| mechanosensory 0.06 → arousal | 0.000 | 0.353 | 0.543 | 0.567 | **0.582** |
+| hygro_thermo 0.20 → reinforcement | 0.138 | **0.177** | 0.014 | **0.000** | 0.000 |
+
+Both of the earlier readings were taken **mid-rise.** mechanosensory takes about
+30 s to reach a plateau, and at that plateau one door event is raw arousal
+0.2238 — comfortably `alert`, no coin-flip. So the honest claim is: *any* door
+event reaches `alert` within about half a minute and fades over a couple of
+minutes, and a flurry at the cap goes further, to `disturbed`.
+
+The second row is the better finding. **hygro_thermo is phasic.** Held at a
+constant drive it peaks near 12 s and is back at *exactly* 0.0000 by 30 s with
+the stimulus still applied, and stays there for the rest of the sweep — it
+answers the onset of a change and then habituates completely, which is what a
+real thermoreceptor does and which nobody wrote. mechanosensory is tonic and
+holds its plateau. It is also why the thermal integrator's time constant is 60 s
+and not the 180 s it started at: a long tau keeps the drive high long after the
+nerve has stopped listening, which makes the *next* temperature change a smaller
+step and therefore a weaker signal.
+
+The phrase that fires on that axis reads "an unfamiliar pattern, briefly
+interesting". That turns out to be the literal truth.
 
 ## `agitation` is inverted
 

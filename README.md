@@ -203,7 +203,7 @@ half nobody can download.
 | part of her | what it is | ours? |
 |---|---|---|
 | **who she is** | a 164,587-neuron simulation of a real fly connectome, continuously running, membrane potentials persisting between requests, never reset | **yes** |
-| **what she senses** | her own traffic → the fly's auditory nerve. The mechanosensory nerve is measured and waiting; the doorbell is not wired to it yet | **yes** |
+| **what she senses** | her own traffic → the fly's auditory nerve; the front door → its mechanosensory nerve; the hardware's heat → its thermoreceptors | **yes** |
 | **how mood reaches words** | state → one appended clause + a temperature nudge | **yes** |
 | **that she is GLaDOS at all** | `Modelfile` — the persona, the sampling band | **yes** |
 | **how she speaks** | `qwen2.5:7b-instruct`, ~7.6 × 10⁹ parameters someone else fitted on ~10¹³ tokens — *or whatever you point `byom.sh` at* | **no** |
@@ -309,7 +309,7 @@ project. (The magnitude is tiny and the effect is not monotonic;
 [docs/HONESTY.md](docs/HONESTY.md) holds that claim to its actual size before
 you quote it at a party.)
 
-### And the nerve we have not wired yet is five times better
+### The nerve we had not wired was five times better
 
 The same probe, pointed at the mechanosensory nerve — what a fly feels with —
 before anything was connected to it
@@ -327,16 +327,58 @@ genuinely clean axis, which hearing never delivered. The probe also rates
 (+0.006, +0.011, −0.006, +0.011, +0.001), so by this project's own rule it has
 earned a measurement and not yet a phrase.
 
-Two things fell out of measuring it that we would otherwise have inherited as
-assumptions. **`reinforcement` is exactly 0.0000 at every drive level on this
-site** — the plan said mechanosensory would drive novelty, valence *and*
-reinforcement, and for reinforcement that is simply false; hearing is actually
-the better of the two there, and still too weak to earn a phrase. And **the
-rescaling span below will have to be re-fitted per site, not globally**: a span
-fitted to hearing's ceiling turns mechanosensory's 0.531 at drive 0.05 into 2.79
-and clips, so the gentlest knock would pin her at maximum alert and every louder
-event would be indistinguishable from it. One global span cannot serve both
-nerves; fit it to touch and being spoken to stops moving her at all.
+And **`reinforcement` is exactly 0.0000 at every drive level on this site.** The
+plan said mechanosensory would drive novelty, valence *and* reinforcement. For
+reinforcement that is simply false, and we would have inherited it as an
+assumption if we had wired first and measured after.
+
+### The site we had written off as a stand-in is the strongest nerve in the fly
+
+`hygro_thermo` — a fly's thermometer and hygrometer — was in the plan as a
+throwaway: somewhere to dump temperature readings, "named in the config as the
+stand-in it is". Probed before wiring, on the same live service
+([`hygro_thermo.json`](measurements/raw/hygro_thermo.json)):
+
+| drive | 0.05 | 0.10 | 0.20 | 0.40 | best |
+|---|--:|--:|--:|--:|--:|
+| novelty | 0.085 | 0.104 | 0.202 | 0.293 | 143 sd |
+| valence | 0.037 | 0.049 | 0.212 | 0.357 | 173 sd |
+| **reinforcement** | 0.007 | 0.035 | 0.257 | 0.420 | **218 sd** |
+| arousal | 0.000 | 0.000 | 0.000 | 0.000 | dead |
+
+All three monotonic. **218 standard deviations on the axis that was dead
+everywhere else** — the strongest coupling anywhere in this fly, on the sense
+nobody expected anything from. And arousal is *exactly* 0.0000 on it, at every
+level, which is the other half of the result.
+
+So the three nerves turn out to be almost perfectly complementary, and nobody
+designed that:
+
+| nerve | what it drives | how hard |
+|---|---|--:|
+| `hearing_JO` — her own traffic | arousal | 40 sd |
+| `mechanosensory` — the door | arousal, agitation | 213 sd |
+| `hygro_thermo` — the heat | novelty, valence, reinforcement | 218 sd |
+
+Four of the five axes now have a measured, monotonic ladder. Before this, one
+did.
+
+### One global span cannot serve two nerves that differ by 5×
+
+The rescaling below was fitted to hearing, whose raw arousal tops out around
+0.19. Mechanosensory reaches 0.531 at drive **0.05** and 1.000 at 0.4, so the
+same span turns a gentle knock into 2.79 and clips it: every door event would
+pin her at maximum and be indistinguishable from every other door event.
+Refitting the span to touch inverts the problem — 0.19 of a 1.0 span never
+reaches a threshold, and her own request traffic stops moving her at all.
+
+Neither, in the end. `arousal` keeps hearing's ceiling, so the weak sense stays
+legible, and **intensity past `alert` is carried by `agitation` instead** —
+which mechanosensory moves monotonically from 0.82 to 0.019, and which is
+deliberately left unscaled. novelty, valence and reinforcement are scaled
+against hygro_thermo, the nerve that actually moves them. Each axis is scaled
+against the span of the sense that drives it, which is the only version of this
+that is not a compromise.
 
 ### The rescaling that stopped it all being theatre
 
@@ -454,8 +496,15 @@ scars.
    most 0.3, never past 0.9. A caller that chose 0.2 chose determinism and
    keeps its floor.
 
-98 checks, 0 failures, against the live fly and real sockets
-([`server/test_mood.py`](server/test_mood.py)).
+148 checks, 0 failures, against the live fly and real sockets:
+[`server/test_mood.py`](server/test_mood.py) (98) and
+[`server/test_ha_senses.py`](server/test_ha_senses.py) (50). The house's senses
+get the same treatment the coupling does — a closed port, a listener that
+accepts and then hangs, an unresolvable host, an HTTP 401, a malformed body —
+plus a fake Home Assistant for the counting, because a doorbell that is
+counted twice rings forever and one that is dropped is the sense not existing.
+Worst bounded latency 1002 ms, nothing raised, and a background thread that
+survives all of it.
 
 One deliberate exception to fail-open: a request whose *only* content is audio
 or an image, where that sense failed, returns **502** naming the dead sense.
@@ -513,11 +562,14 @@ fly/                   layer 1 — the brain
 server/                layer 2 — mood → words
   mood.py                state → clause + temperature, and all the fail-open paths
   afferent.py            her own traffic → the auditory nerve
+  ha_afferent.py         the front door → touch, the hardware's heat → thermo
   senses.py              vision, hearing and voice behind one model name
   gladosd.py             the Ollama-compatible front end
   test_mood.py           fail-open tests against real sockets
+  test_ha_senses.py      the house's senses, including a fake HA that misbehaves
   proof_fly_centred.py   the end-to-end proof, with its control arm
   proof_byom.py          the fly drives a base it has never seen, with its control arm
+  proof_ha_senses.py     a door event and a warm rack reaching her words
 
 measurements/raw/      every number quoted anywhere, as the tool emitted it
 docs/                  the long versions
@@ -604,15 +656,13 @@ oversell and the measured version is more interesting than the hype:
   The event log records the raw vector, the rescaled vector, the chosen phrase
   and the effective temperature for every single request, so *"why did she say
   that"* always has an answer.
-- **It is not finished.** Only `arousal` is usefully driven today. The
-  mechanosensory nerve is now measured and it is five times the sense hearing
-  is — **213 standard deviations** of arousal at full drive against hearing's
-  40 — and it adds `agitation` as a second cleanly monotonic axis. It waits on
-  a door sensor rather than on physics. `reinforcement` is a different story:
-  it reads **exactly
-  0.0000 at every drive level** on that site, so the plan's promise that
-  mechanosensory would drive it is withdrawn here rather than quietly
-  inherited.
+- **It is not finished.** Four of the five axes are now driven by a measured,
+  monotonic ladder — `arousal` and `agitation` by the door, `novelty`, `valence`
+  and `reinforcement` by the heat. The fifth, and the honest gap: `displeased`
+  is an unreachable phrase, because raw valence has never gone below −0.005 on
+  any nerve. And her thermal sense is currently wired to **machine**
+  temperatures, because every room climate sensor in the house reports
+  `unavailable`.
 - **It is not a simulated fly having experiences.** It is a sparse matrix being
   multiplied, and we have no idea what, if anything, that is like. We are
   careful about this claim in both directions.

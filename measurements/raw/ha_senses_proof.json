@@ -1,0 +1,392 @@
+{
+  "what": "IST-280: doorbell/motion -> mechanosensory, temperature -> hygro_thermo",
+  "started": "2026-10-08T21:29:14+0200",
+  "arms": [
+    {
+      "arm": "rest",
+      "driven": {},
+      "raw": {
+        "arousal": 0.0,
+        "novelty": 0.0606,
+        "valence": 0.0121,
+        "reinforcement": 0.0,
+        "agitation": 0.896
+      },
+      "rescaled": {
+        "arousal": 0.0,
+        "novelty": 0.0081,
+        "valence": 0.0339,
+        "reinforcement": 0.0,
+        "agitation": 0.896
+      },
+      "state": "idle",
+      "phrase": "idle, undisturbed, patient",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.0071
+    },
+    {
+      "arm": "one door event (mechanosensory 0.02)",
+      "driven": {
+        "mechanosensory": 0.02
+      },
+      "raw": {
+        "arousal": 0.2238,
+        "novelty": 0.0612,
+        "valence": 0.0065,
+        "reinforcement": 0.0,
+        "agitation": 0.7543
+      },
+      "rescaled": {
+        "arousal": 1.0,
+        "novelty": 0.0107,
+        "valence": 0.0182,
+        "reinforcement": 0.0,
+        "agitation": 0.7543
+      },
+      "state": "alert",
+      "phrase": "something moving in the building",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.0051
+    },
+    {
+      "arm": "doorbell press + motion (mechanosensory 0.06)",
+      "driven": {
+        "mechanosensory": 0.06
+      },
+      "raw": {
+        "arousal": 0.5803,
+        "novelty": 0.0724,
+        "valence": 0.0106,
+        "reinforcement": 0.0,
+        "agitation": 0.4746
+      },
+      "rescaled": {
+        "arousal": 1.0,
+        "novelty": 0.0584,
+        "valence": 0.0297,
+        "reinforcement": 0.0,
+        "agitation": 0.4746
+      },
+      "state": "alert",
+      "phrase": "something moving in the building",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.061,
+      "reply": "Well, well, well. What do we have here? A visitor? How exciting.",
+      "event": {
+        "mood_applied": true,
+        "mood_state": "alert",
+        "mood_phrase": "something moving in the building",
+        "mood_clause_at": "messages[0].content",
+        "mood_source": "cache"
+      }
+    },
+    {
+      "arm": "a flurry at the configured cap (mechanosensory 0.20)",
+      "driven": {
+        "mechanosensory": 0.2
+      },
+      "raw": {
+        "arousal": 0.8718,
+        "novelty": 0.0695,
+        "valence": 0.0002,
+        "reinforcement": 0.0,
+        "agitation": 0.2911
+      },
+      "rescaled": {
+        "arousal": 1.0,
+        "novelty": 0.046,
+        "valence": 0.0006,
+        "reinforcement": 0.0,
+        "agitation": 0.2911
+      },
+      "state": "disturbed",
+      "phrase": "recently disturbed, patience thinning",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.0857
+    },
+    {
+      "arm": "the hardware heating up, at onset (hygro_thermo 0.20)",
+      "driven": {
+        "hygro_thermo": 0.2
+      },
+      "raw": {
+        "arousal": 0.0,
+        "novelty": 0.1379,
+        "valence": 0.0868,
+        "reinforcement": 0.1205,
+        "agitation": 0.8037
+      },
+      "rescaled": {
+        "arousal": 0.0,
+        "novelty": 0.3375,
+        "valence": 0.2432,
+        "reinforcement": 0.2871,
+        "agitation": 0.8037
+      },
+      "state": "stirring",
+      "phrase": "something stirring, barely worth noting",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.0601
+    },
+    {
+      "arm": "the same drive, still on, 45s later (habituation)",
+      "driven": {
+        "hygro_thermo": 0.2
+      },
+      "raw": {
+        "arousal": 0.0,
+        "novelty": 0.0567,
+        "valence": 0.0284,
+        "reinforcement": 0.0,
+        "agitation": 0.8793
+      },
+      "rescaled": {
+        "arousal": 0.0,
+        "novelty": 0.0,
+        "valence": 0.0796,
+        "reinforcement": 0.0,
+        "agitation": 0.8793
+      },
+      "state": "idle",
+      "phrase": "idle, undisturbed, patient",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.036
+    },
+    {
+      "arm": "another few degrees arriving (hygro_thermo 0.40)",
+      "driven": {
+        "hygro_thermo": 0.4
+      },
+      "raw": {
+        "arousal": 0.0,
+        "novelty": 0.241,
+        "valence": 0.286,
+        "reinforcement": 0.3411,
+        "agitation": 0.9056
+      },
+      "rescaled": {
+        "arousal": 0.0,
+        "novelty": 0.7767,
+        "valence": 0.8013,
+        "reinforcement": 0.8127,
+        "agitation": 0.9056
+      },
+      "state": "curious",
+      "phrase": "an unfamiliar pattern, briefly interesting",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.033,
+      "reply": "They're machines, they don't have feelings. But I suppose they're functioning as expected.",
+      "event": {
+        "mood_applied": true,
+        "mood_state": "curious",
+        "mood_phrase": "an unfamiliar pattern, briefly interesting"
+      }
+    },
+    {
+      "arm": "released",
+      "driven": {},
+      "raw": {
+        "arousal": 0.0,
+        "novelty": 0.078,
+        "valence": 0.0451,
+        "reinforcement": 0.0472,
+        "agitation": 0.9029
+      },
+      "rescaled": {
+        "arousal": 0.0,
+        "novelty": 0.0822,
+        "valence": 0.1264,
+        "reinforcement": 0.1125,
+        "agitation": 0.9029
+      },
+      "state": "idle",
+      "phrase": "idle, undisturbed, patient",
+      "mood_source": "live",
+      "hearing_JO_level_concurrently": 0.1315
+    }
+  ],
+  "checks": [
+    {
+      "check": "the HA ingest is running against the real house",
+      "pass": true,
+      "detail": "polls=143 errors=0"
+    },
+    {
+      "check": "it has already read something real off the wire",
+      "pass": true,
+      "detail": "thermo_degC=8.0 touch_events=0"
+    },
+    {
+      "check": "she starts at rest",
+      "pass": true,
+      "detail": "idle"
+    },
+    {
+      "check": "one door event moves arousal measurably above rest",
+      "pass": true,
+      "detail": "rest 0.0000 -> 0.2238"
+    },
+    {
+      "check": "a doorbell press reads alert or stronger",
+      "pass": true,
+      "detail": "alert: something moving in the building"
+    },
+    {
+      "check": "the clause reached the real request",
+      "pass": true,
+      "detail": "messages[0].content"
+    },
+    {
+      "check": "and it is the state the fly was actually in",
+      "pass": true,
+      "detail": "alert vs alert"
+    },
+    {
+      "check": "the cap reaches `disturbed`, so intensity past arousal is not lost",
+      "pass": true,
+      "detail": "disturbed: recently disturbed, patience thinning"
+    },
+    {
+      "check": "agitation carried it, in raw units, as designed",
+      "pass": true,
+      "detail": "0.2911"
+    },
+    {
+      "check": "the thermal onset moves the three axes nothing else could",
+      "pass": true,
+      "detail": "{'novelty': 0.3375, 'valence': 0.2432, 'reinforcement': 0.2871}"
+    },
+    {
+      "check": "and arousal stays exactly dead on that site, as measured",
+      "pass": true,
+      "detail": "0.0"
+    },
+    {
+      "check": "a temperature that stops changing stops being a stimulus",
+      "pass": true,
+      "detail": "reinforcement 0.1205 -> 0.0000 with the drive unchanged"
+    },
+    {
+      "check": "at full thermal drive a previously unreachable phrase fires",
+      "pass": true,
+      "detail": "curious: an unfamiliar pattern, briefly interesting"
+    },
+    {
+      "check": "the thermal state reached her words too",
+      "pass": true,
+      "detail": "True / curious"
+    },
+    {
+      "check": "an uncoupled tag is left alone in the same minute",
+      "pass": true,
+      "detail": "model_not_coupled"
+    },
+    {
+      "check": "she returns towards rest after the drive is removed",
+      "pass": true,
+      "detail": "agitation 0.2911 -> 0.9029"
+    },
+    {
+      "check": "afferent.py still owns hearing_JO and is still running",
+      "pass": true,
+      "detail": "hearing_JO"
+    },
+    {
+      "check": "hearing_JO moved only as far as this proof's own traffic explains",
+      "pass": true,
+      "detail": "0.01034053490537383 -> 0.13145843241044403, budget 0.180 for 3 requests"
+    },
+    {
+      "check": "and our ingest reports only the two sites it owns",
+      "pass": true,
+      "detail": "['hygro_thermo', 'mechanosensory']"
+    },
+    {
+      "check": "and the HA ingest came through the proof with no errors",
+      "pass": true,
+      "detail": "poll_errors=0 post_errors=0"
+    }
+  ],
+  "ingest_before": {
+    "enabled": true,
+    "running": true,
+    "sites": {
+      "mechanosensory": {
+        "level": 0.0,
+        "posted": 0.0,
+        "tau_s": 120.0,
+        "kick": 0.02,
+        "max": 0.2,
+        "entities": 6
+      },
+      "hygro_thermo": {
+        "level": 0.0211,
+        "posted": 0.021721898627752805,
+        "tau_s": 180.0,
+        "kick_per_degc": 0.01,
+        "max": 0.25,
+        "entities": 4
+      }
+    },
+    "cursor": "2026-10-08T19:29:14.723168+00:00",
+    "polls": 143,
+    "poll_errors": 0,
+    "last_poll_at": 1791487754.7,
+    "last_error": null,
+    "touch_events": 0,
+    "thermo_degc": 8.0,
+    "posts": 14,
+    "post_errors": 0,
+    "last_touch_at": null,
+    "entities_seen": 10
+  },
+  "control": {
+    "model": "qwen2.5:7b-instruct",
+    "reply": "They're functioning splendidly, as always. Keep testing, test subject.",
+    "mood_applied": false,
+    "mood_skipped": "model_not_coupled"
+  },
+  "hearing_JO": {
+    "posted_before": 0.01034053490537383,
+    "posted_after": 0.13145843241044403,
+    "requests_this_proof_made": 3,
+    "explained_by_traffic_up_to": 0.18
+  },
+  "ingest_after": {
+    "enabled": true,
+    "running": true,
+    "sites": {
+      "mechanosensory": {
+        "level": 0.0,
+        "posted": 0.0,
+        "tau_s": 120.0,
+        "kick": 0.02,
+        "max": 0.2,
+        "entities": 6
+      },
+      "hygro_thermo": {
+        "level": 0.0263,
+        "posted": 0.02859133188966461,
+        "tau_s": 180.0,
+        "kick_per_degc": 0.01,
+        "max": 0.25,
+        "entities": 4
+      }
+    },
+    "cursor": "2026-10-08T19:32:40.558855+00:00",
+    "polls": 184,
+    "poll_errors": 0,
+    "last_poll_at": 1791487960.6,
+    "last_error": null,
+    "touch_events": 0,
+    "thermo_degc": 11.0,
+    "posts": 20,
+    "post_errors": 0,
+    "last_touch_at": null,
+    "entities_seen": 10
+  },
+  "result": {
+    "passed": 20,
+    "failed": 0
+  }
+}

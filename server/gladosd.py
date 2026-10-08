@@ -59,6 +59,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from socketserver import ThreadingMixIn
 
 import afferent
+import ha_afferent
 import mood
 import senses
 
@@ -142,6 +143,71 @@ DEFAULTS = {
     "ingest_epsilon": 0.005,
     "ingest_floor": 0.002,
     "ingest_timeout_s": 2.0,
+    # ---- layer 2b: the HA-sourced senses (ha_afferent.py) ------------------
+    # IST-280. Doorbell/motion/occupancy -> mechanosensory, temperature change
+    # -> hygro_thermo. Both sites were probed on the live service before being
+    # wired; see measurements/mechanosensory.json and hygro_thermo.json, and
+    # the AXIS_SPAN comment in mood.py for which axes each one actually moves.
+    "ha_ingest": True,
+    "ha_env_path": "/opt/paperclip-glados/secrets/ha.env",
+    "ha_poll_s": 5.0,
+    "ha_timeout_s": 10.0,
+    "ha_post_timeout_s": 2.0,
+    # First poll looks back this far, so a restart does not lose the last few
+    # seconds of events. Later polls use the cursor.
+    "ha_backfill_s": 30.0,
+    # Touch. 28 "on" transitions across these six entities in the last 24h.
+    # The measured ladder at a kick of 0.02, and the measurement corrected an
+    # earlier reading of it: at the 30 s PLATEAU one event is raw arousal
+    # 0.2238, which rescales past 1.0 and reads `alert`. Sampled at 12 s it
+    # read 0.0629 and then 0.0275 on two runs, which looked like a threshold
+    # coin-flip and was really just mid-rise - mechanosensory takes ~30 s to
+    # plateau (measurements/rise_time.json). So: any door event reaches
+    # `alert` within about half a minute and fades over a couple of minutes;
+    # a flurry at the cap of 0.20 goes further, to `disturbed`, carried by
+    # agitation (raw 0.19). Capped
+    # well short of the 0.4 afferent.py uses for hearing, because the same
+    # drive is 5x stronger here: 0.4 would pin her at maximum permanently.
+    "ha_touch_entities": [
+        "binary_sensor.front_door_visitor",
+        "binary_sensor.front_door_person",
+        "binary_sensor.front_door_vehicle",
+        "binary_sensor.front_door_pet",
+        "binary_sensor.front_door_bevaegelse",
+        "binary_sensor.presence_sensor_fp2_6010_presence_sensor_1",
+    ],
+    "ha_touch_kick": 0.02,
+    "ha_touch_tau_s": 120.0,
+    "ha_touch_max": 0.20,
+    # Thermo. NAMED AS THE STAND-IN IT IS: every room climate sensor in this
+    # house reports `unavailable` right now - both thermostats, their external
+    # probes, the living-room sensor and the only humidity sensor - so her
+    # thermal sense is the heat coming off the hardware she runs on. Those are
+    # live and they move (1.0-3.7 degC mean step). If the thermostats come
+    # back, put them at the front of this list.
+    "ha_thermo_entities": [
+        "sensor.nasty_temperature",
+        "sensor.disk_box1_ct2000p3ssd8_temperature",
+        "sensor.disk_box3_ct2000p3ssd8_temperature",
+        "sensor.nasty_drive_1_temperature",
+    ],
+    "ha_thermo_kick": 0.01,
+    # 60 s, not the 180 s this started at, and the reason is a measurement.
+    # hygro_thermo is a PHASIC nerve: driven at a constant 0.20 it rises to
+    # reinforcement 0.177 by 12 s and is back at exactly 0.0000 by 30 s, where
+    # it stays (measurements/rise_time.json). It answers the ONSET of a change
+    # and then habituates completely - which is what a real thermoreceptor
+    # does, and it is why `curious` is phrased "briefly interesting".
+    # mechanosensory is tonic by contrast: at 0.06 it climbs to a 0.58 plateau
+    # in ~30 s and holds.
+    # So a long tau is actively harmful here: it keeps the drive elevated long
+    # after the nerve has stopped listening, which makes the NEXT temperature
+    # change a smaller step and therefore a weaker signal. A tau near the
+    # habituation time means each change gets its own clean onset.
+    "ha_thermo_tau_s": 60.0,
+    "ha_thermo_max": 0.25,
+    "ha_epsilon": 0.005,
+    "ha_floor": 0.002,
     # ---- the senses: one model called `glados` (senses.py) -----------------
     # "can we cobble every model we have running in to the GLaDOS model."
     # Yes, at the API: `glados` takes an image (moondream), takes speech
@@ -414,6 +480,7 @@ class Handler(BaseHTTPRequestHandler):
             },
             "mood": mood.health(CFG),
             "ingest": afferent.health(CFG),
+            "ha_ingest": ha_afferent.health(CFG),
             "senses": senses.health(CFG),
             "counters": dict(COUNTERS),
         })
@@ -660,12 +727,15 @@ def main():
         servers.append(srv)
         threading.Thread(target=srv.serve_forever, name="listen-%d" % port, daemon=True).start()
     ingest = afferent.start(CFG)
+    ha_ingest = ha_afferent.start(CFG)
     log_event(event="startup", listen="%s:%s" % (CFG["listen_host"], CFG["listen_ports"]),
               backend=CFG["backend"], pid=os.getpid(),
               mood_coupling=bool(CFG["mood_coupling"]),
               mood_models=CFG["mood_models"] if CFG["mood_coupling"] else None,
               mood_ingest=ingest,
               ingest_site=CFG["ingest_site"] if ingest else None,
+              ha_ingest=ha_ingest,
+              ha_sites=list(ha_afferent.OWNED) if ha_ingest == "running" else None,
               mood_url=CFG["mood_url"] if CFG["mood_coupling"] else None,
               multimodal=bool(CFG.get("multimodal")),
               multimodal_models=(CFG.get("multimodal_models")

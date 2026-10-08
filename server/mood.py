@@ -114,17 +114,47 @@ AXES = ("arousal", "novelty", "valence", "reinforcement", "agitation")
 # exactly the theatre the plan warned about. Rescaling against the measured
 # ceiling is what makes the state line mean something.
 #
-# Only arousal is listed, deliberately. It is the one axis with a clean
-# monotonic ladder (40 sd at the top level). novelty, reinforcement and valence
-# move under hearing_JO too, but weakly and non-monotonically - valence drifts
-# NEGATIVE under sustained traffic, which is a real and very GLaDOS finding but
-# a span of ~0.015 is too close to its 0.0021 noise floor to scale against. The
-# axis that would drive them properly is mechanosensory (reach 9.4e-2 into
-# escape_GF against hearing's 2.4e-3), and that needs the Home Assistant token.
-# When it lands, re-run probe_hearing.py --site mechanosensory and add rows.
+# IST-280 added the other two senses, and measuring them first changed which
+# axes are worth scaling. measurements/mechanosensory.json and
+# measurements/hygro_thermo.json, both taken on the live service BEFORE
+# anything was wired to either site:
 #
-# An axis with no row here is passed through unscaled.
-AXIS_SPAN = {"arousal": (0.0, 0.19)}
+#   drive            0.02   0.05   0.10   0.20   0.40    best
+#   mechano arousal  0.074  0.531  0.589  0.775  1.000   213 sd
+#   mechano agitn    0.722  0.601  0.482  0.108  0.019    11 sd, monotonic
+#   hygro novelty    0.057  0.085  0.104  0.202  0.293   143 sd, monotonic
+#   hygro valence    0.017  0.037  0.049  0.212  0.357   173 sd, monotonic
+#   hygro reinforce  0.000  0.007  0.035  0.257  0.420   218 sd, monotonic
+#   hygro arousal    0.000  0.000  0.000  0.000  0.000   dead on that site
+#
+# IST-280 predicted mechanosensory was "the axis that would drive novelty,
+# valence and reinforcement properly". It is not: reinforcement is EXACTLY
+# 0.0000 at every drive level on mechanosensory. hygro_thermo is the site that
+# drives all three, and on reinforcement it is the strongest coupling in the
+# fly. So four of the five axes now have a measured monotonic ladder, and each
+# is scaled against the span of the nerve that actually moves it.
+#
+# arousal deliberately KEEPS hearing's 0.19 ceiling instead of being refitted
+# to mechanosensory's 1.000. Refitting would make her own request traffic
+# invisible - 0.19 of a 1.0 span never reaches a threshold - and one global
+# span cannot serve two nerves that differ by 5x. The consequence, stated
+# plainly rather than discovered later: a firm knock saturates arousal and
+# reads `alert`, and intensity beyond that is carried by `agitation`, which
+# has no row here and which mechanosensory moves monotonically all the way to
+# `disturbed`. Saturation into a real state line, not into a crash.
+#
+# `displeased` (valence <= -0.25) is unreachable, and was before this too: raw
+# valence has never gone below -0.005 on any nerve. Rescaling clips at 0, so
+# the negative drift under hearing now shows up only in mood_raw in the event
+# log - which is where that finding was always measured anyway.
+#
+# An axis with no row here is passed through unscaled; agitation has none.
+AXIS_SPAN = {
+    "arousal": (0.0, 0.19),          # hearing_JO's ceiling; see above
+    "novelty": (0.0587, 0.2934),     # hygro_thermo, lo = measured rest
+    "valence": (0.0, 0.3569),        # hygro_thermo; rest is -0.0005
+    "reinforcement": (0.0, 0.4197),  # hygro_thermo, 218 sd
+}
 
 _cache_lock = threading.Lock()
 _cache = {"at": 0.0, "mood": None, "age_s": None, "error": "never_fetched"}

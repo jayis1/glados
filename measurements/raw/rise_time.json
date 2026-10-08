@@ -1,0 +1,225 @@
+{
+  "what": "rise time per site, same drive, sampled every 6s",
+  "runs": [
+    {
+      "site": "mechanosensory",
+      "drive": 0.06,
+      "key_axis": "arousal",
+      "rest": {
+        "arousal": 0.0,
+        "novelty": 0.0771,
+        "valence": 0.0315,
+        "reinforcement": 0.0,
+        "agitation": 0.9427
+      },
+      "series": [
+        {
+          "t_s": 6.0,
+          "arousal": 0.0,
+          "novelty": 0.0698,
+          "valence": 0.0273,
+          "reinforcement": 0.0,
+          "agitation": 0.7122
+        },
+        {
+          "t_s": 12.0,
+          "arousal": 0.3531,
+          "novelty": 0.0717,
+          "valence": 0.0169,
+          "reinforcement": 0.0,
+          "agitation": 0.5131
+        },
+        {
+          "t_s": 18.0,
+          "arousal": 0.4865,
+          "novelty": 0.0573,
+          "valence": 0.0039,
+          "reinforcement": 0.0,
+          "agitation": 0.5322
+        },
+        {
+          "t_s": 24.0,
+          "arousal": 0.5434,
+          "novelty": 0.055,
+          "valence": 0.0064,
+          "reinforcement": 0.0,
+          "agitation": 0.4721
+        },
+        {
+          "t_s": 30.0,
+          "arousal": 0.567,
+          "novelty": 0.0545,
+          "valence": -0.0127,
+          "reinforcement": 0.0,
+          "agitation": 0.4655
+        },
+        {
+          "t_s": 36.0,
+          "arousal": 0.5754,
+          "novelty": 0.0445,
+          "valence": 0.0025,
+          "reinforcement": 0.0,
+          "agitation": 0.4255
+        },
+        {
+          "t_s": 42.0,
+          "arousal": 0.5789,
+          "novelty": 0.0464,
+          "valence": 0.0042,
+          "reinforcement": 0.0,
+          "agitation": 0.5398
+        },
+        {
+          "t_s": 48.0,
+          "arousal": 0.5803,
+          "novelty": 0.0506,
+          "valence": 0.001,
+          "reinforcement": 0.0,
+          "agitation": 0.5458
+        },
+        {
+          "t_s": 54.0,
+          "arousal": 0.5811,
+          "novelty": 0.0499,
+          "valence": 0.0004,
+          "reinforcement": 0.0,
+          "agitation": 0.5602
+        },
+        {
+          "t_s": 60.0,
+          "arousal": 0.5823,
+          "novelty": 0.061,
+          "valence": -0.0039,
+          "reinforcement": 0.0,
+          "agitation": 0.5289
+        },
+        {
+          "t_s": 66.0,
+          "arousal": 0.5819,
+          "novelty": 0.0598,
+          "valence": 0.0,
+          "reinforcement": 0.0,
+          "agitation": 0.4553
+        },
+        {
+          "t_s": 72.0,
+          "arousal": 0.5824,
+          "novelty": 0.058,
+          "valence": 0.015,
+          "reinforcement": 0.0,
+          "agitation": 0.5066
+        }
+      ]
+    },
+    {
+      "site": "hygro_thermo",
+      "drive": 0.2,
+      "key_axis": "reinforcement",
+      "rest": {
+        "arousal": 0.0,
+        "novelty": 0.0431,
+        "valence": 0.0071,
+        "reinforcement": 0.0,
+        "agitation": 0.8376
+      },
+      "series": [
+        {
+          "t_s": 6.0,
+          "arousal": 0.0,
+          "novelty": 0.1257,
+          "valence": 0.1208,
+          "reinforcement": 0.1383,
+          "agitation": 0.8744
+        },
+        {
+          "t_s": 12.0,
+          "arousal": 0.0,
+          "novelty": 0.1494,
+          "valence": 0.1386,
+          "reinforcement": 0.1769,
+          "agitation": 0.8251
+        },
+        {
+          "t_s": 18.0,
+          "arousal": 0.0,
+          "novelty": 0.0986,
+          "valence": 0.0632,
+          "reinforcement": 0.0783,
+          "agitation": 0.7681
+        },
+        {
+          "t_s": 24.0,
+          "arousal": 0.0,
+          "novelty": 0.0744,
+          "valence": 0.0207,
+          "reinforcement": 0.0138,
+          "agitation": 0.8157
+        },
+        {
+          "t_s": 30.0,
+          "arousal": 0.0,
+          "novelty": 0.0757,
+          "valence": 0.0244,
+          "reinforcement": 0.0,
+          "agitation": 0.8144
+        },
+        {
+          "t_s": 36.0,
+          "arousal": 0.0,
+          "novelty": 0.065,
+          "valence": 0.0156,
+          "reinforcement": 0.0,
+          "agitation": 0.9058
+        },
+        {
+          "t_s": 42.0,
+          "arousal": 0.0,
+          "novelty": 0.0654,
+          "valence": 0.0098,
+          "reinforcement": 0.0,
+          "agitation": 0.8998
+        },
+        {
+          "t_s": 48.0,
+          "arousal": 0.0,
+          "novelty": 0.0737,
+          "valence": 0.0081,
+          "reinforcement": 0.0,
+          "agitation": 0.7783
+        },
+        {
+          "t_s": 54.0,
+          "arousal": 0.0,
+          "novelty": 0.0565,
+          "valence": -0.0076,
+          "reinforcement": 0.0,
+          "agitation": 0.7743
+        },
+        {
+          "t_s": 60.0,
+          "arousal": 0.0,
+          "novelty": 0.0609,
+          "valence": -0.0163,
+          "reinforcement": 0.0,
+          "agitation": 0.7945
+        },
+        {
+          "t_s": 66.0,
+          "arousal": 0.0,
+          "novelty": 0.0625,
+          "valence": 0.0111,
+          "reinforcement": 0.0,
+          "agitation": 0.8491
+        },
+        {
+          "t_s": 72.0,
+          "arousal": 0.0,
+          "novelty": 0.064,
+          "valence": 0.0173,
+          "reinforcement": 0.0,
+          "agitation": 0.9286
+        }
+      ]
+    }
+  ]
+}

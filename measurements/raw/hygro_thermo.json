@@ -1,0 +1,204 @@
+{
+ "site": "hygro_thermo",
+ "levels": {
+  "0.02": {
+   "mood": {
+    "arousal": 0.0,
+    "novelty": 0.0571,
+    "valence": 0.01732,
+    "reinforcement": 0.0,
+    "agitation": 0.88968
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.009399999999999999,
+    "valence": 0.013699999999999999,
+    "reinforcement": 0.0,
+    "agitation": 0.05399999999999994
+   },
+   "delta": {
+    "arousal": 0.0,
+    "novelty": -0.0016200000000000103,
+    "valence": 0.017779999999999997,
+    "reinforcement": 0.0,
+    "agitation": 0.06218000000000001
+   },
+   "sigma": {
+    "arousal": 0.0,
+    "novelty": 0.9852149796472248,
+    "valence": 8.584908576802507,
+    "reinforcement": 0.0,
+    "agitation": 0.8494535519125684
+   }
+  },
+  "0.05": {
+   "mood": {
+    "arousal": 0.0,
+    "novelty": 0.08464,
+    "valence": 0.037180000000000005,
+    "reinforcement": 0.00742,
+    "agitation": 0.87076
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.006099999999999994,
+    "valence": 0.0087,
+    "reinforcement": 0.0111,
+    "agitation": 0.06570000000000009
+   },
+   "delta": {
+    "arousal": 0.0,
+    "novelty": 0.02592,
+    "valence": 0.03764000000000001,
+    "reinforcement": 0.00742,
+    "agitation": 0.043259999999999965
+   },
+   "sigma": {
+    "arousal": 0.0,
+    "novelty": 15.763439674355496,
+    "valence": 18.1741259184953,
+    "reinforcement": 3.845949962546817,
+    "agitation": 0.5909836065573766
+   }
+  },
+  "0.1": {
+   "mood": {
+    "arousal": 0.0,
+    "novelty": 0.10407999999999999,
+    "valence": 0.04848,
+    "reinforcement": 0.03508,
+    "agitation": 0.79964
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.0087,
+    "valence": 0.017800000000000003,
+    "reinforcement": 0.026900000000000004,
+    "agitation": 0.057499999999999996
+   },
+   "delta": {
+    "arousal": 0.0,
+    "novelty": 0.045359999999999984,
+    "valence": 0.048940000000000004,
+    "reinforcement": 0.03508,
+    "agitation": -0.027859999999999996
+   },
+   "sigma": {
+    "arousal": 0.0,
+    "novelty": 27.58601943012211,
+    "valence": 23.630226420062698,
+    "reinforcement": 18.182739176029962,
+    "agitation": 0.3806010928961748
+   }
+  },
+  "0.2": {
+   "mood": {
+    "arousal": 0.0,
+    "novelty": 0.20220000000000002,
+    "valence": 0.21148000000000003,
+    "reinforcement": 0.25662,
+    "agitation": 0.8210799999999999
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.022400000000000003,
+    "valence": 0.0572,
+    "reinforcement": 0.04870000000000002,
+    "agitation": 0.0343
+   },
+   "delta": {
+    "arousal": 0.0,
+    "novelty": 0.14348,
+    "valence": 0.21194000000000002,
+    "reinforcement": 0.25662,
+    "agitation": -0.006420000000000092
+   },
+   "sigma": {
+    "arousal": 0.0,
+    "novelty": 87.25842301221168,
+    "valence": 102.33326905329154,
+    "reinforcement": 133.01181662921348,
+    "agitation": 0.08770491803278814
+   }
+  },
+  "0.4": {
+   "mood": {
+    "arousal": 0.0,
+    "novelty": 0.29336,
+    "valence": 0.35694,
+    "reinforcement": 0.41967999999999994,
+    "agitation": 0.81748
+   },
+   "jitter": {
+    "arousal": 0.0,
+    "novelty": 0.004699999999999982,
+    "valence": 0.011099999999999999,
+    "reinforcement": 0.009799999999999975,
+    "agitation": 0.049000000000000044
+   },
+   "delta": {
+    "arousal": 0.0,
+    "novelty": 0.23464000000000002,
+    "valence": 0.3574,
+    "reinforcement": 0.41967999999999994,
+    "agitation": -0.010020000000000029
+   },
+   "sigma": {
+    "arousal": 0.0,
+    "novelty": 142.69805112618727,
+    "valence": 172.56728489028214,
+    "reinforcement": 217.52941782771532,
+    "agitation": 0.13688524590163972
+   }
+  }
+ },
+ "noise_floor": {
+  "arousal": 0.004693410544996031,
+  "novelty": 0.0016443111741765055,
+  "valence": 0.0020710762195003188,
+  "reinforcement": 0.0019293022718076189,
+  "agitation": 0.0732
+ },
+ "engine": {
+  "engine": "connectome-lif",
+  "neurons": 164587,
+  "edges": 24539704,
+  "ms_step": 4.765,
+  "realtime": 0.2098
+ },
+ "started": "2026-10-08T21:03:53+0200",
+ "rest": {
+  "arousal": 0.0,
+  "novelty": 0.05872000000000001,
+  "valence": -0.00046,
+  "reinforcement": 0.0,
+  "agitation": 0.8275
+ },
+ "verdict": {
+  "novelty": {
+   "max_sigma": 142.7,
+   "at_level": "0.4",
+   "usable": true
+  },
+  "valence": {
+   "max_sigma": 172.6,
+   "at_level": "0.4",
+   "usable": true
+  },
+  "agitation": {
+   "max_sigma": 0.8,
+   "at_level": "0.02",
+   "usable": false
+  },
+  "reinforcement": {
+   "max_sigma": 217.5,
+   "at_level": "0.4",
+   "usable": true
+  }
+ },
+ "usable_axes": [
+  "novelty",
+  "valence",
+  "reinforcement"
+ ]
+}

@@ -334,8 +334,12 @@ check("...which the RAW value never could", ladder[-1] < 0.50, ladder[-1])
 check("rest still reads 0.0", scaled[0] == 0.0)
 check("rescaling clips at 1.0, so a synthetic 1.0 stays 1.0",
       mood.rescale(dict(rest, arousal=1.0), SPAN_CFG)["arousal"] == 1.0)
+# This used `novelty` until IST-280 measured hygro_thermo and gave novelty,
+# valence and reinforcement spans of their own. `agitation` is now the one axis
+# deliberately left unscaled: mechanosensory moves it monotonically in RAW
+# units, and it is what carries intensity past arousal's ceiling.
 check("an axis with no measured span passes through untouched",
-      mood.rescale(dict(rest, novelty=0.3), SPAN_CFG)["novelty"] == 0.3)
+      mood.rescale(dict(rest, agitation=0.3), SPAN_CFG)["agitation"] == 0.3)
 check("a zero-width span is ignored rather than dividing by zero",
       mood.rescale(dict(rest, arousal=0.05),
                    dict(BASE_CFG, mood_axis_span={"arousal": (0.2, 0.2)})
