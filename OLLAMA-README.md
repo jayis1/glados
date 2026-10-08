@@ -112,15 +112,22 @@ unbroken wall of grey text — that is the rendered-view paste, and the fix is t
 go back to the raw link. This is the one failure that still reads fine
 afterwards, so it is worth the extra click.
 
-## Route 2 — one line in the console
+## Route 2 — one line in the console, both fields at once
 
 Same endpoint, same session, no 13 KB in a textarea. **No clipboard is involved,
-so the stripping failure above cannot happen on this route.** On the model page,
-signed in, press `F12` and go to **Console**:
+so the stripping failure above cannot happen on this route** — and it fixes the
+description in the same action. On the model page, signed in, press `F12` and go
+to **Console**:
 
 ```js
-fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md').then(r=>r.text()).then(t=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({readme:t.trim()})})).then(r=>r.ok?location.reload():alert('Failed: '+r.status))
+(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const t=await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text();const r=await P({readme:t.trim()});alert('description '+d.status+', readme '+r.status);location.reload()})()
 ```
+
+It writes the description first and the readme second, deliberately. Both are
+partial updates to the same endpoint — the page's own UI posts `summary` on its
+own from the title form and `readme` on its own from the edit box, so neither
+clears the other. Ordering the big one last just means that if anything is going
+to be surprising, it happens before the 13 KB write rather than after it.
 
 **Chrome and Edge refuse the first paste into a console**, with a self-XSS
 warning: they want you to type `allow pasting` and press enter, once per
@@ -140,7 +147,7 @@ a bookmark's URL field is not blocked.
 2. Name it `GLaDOS readme`; replace its URL with:
 
 ```
-javascript:(function(){fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md').then(r=>r.text()).then(t=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({readme:t.trim()})})).then(r=>r.ok?location.reload():alert('Failed: '+r.status))})()
+javascript:(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const t=await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text();const r=await P({readme:t.trim()});alert('description '+d.status+', readme '+r.status);location.reload()})()
 ```
 
 3. Open <https://ollama.com/jais/GLaDOS> and click the bookmark. The page
@@ -160,8 +167,9 @@ the first thing anyone reads about her, and right now it says:
 https://github.com/jayis1/glados
 ```
 
-Which is a link, not a description. 255 characters, plain text, no markdown.
-Suggested:
+Which is a link, not a description. **Routes 2 and 3 set it for you**; this is
+the manual version. Click **Edit** beside it, select all, paste. 255 characters
+maximum, plain text, no markdown. Suggested (254):
 
 ```
 An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados
