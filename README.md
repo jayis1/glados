@@ -90,6 +90,14 @@ register the machine. The script tells you so and exits non-zero rather than
 reporting a publication that did not happen — `ollama push` prints that link and
 still exits **0**, so its exit status is not evidence of an upload.
 
+The model page's *readme* is a separate thing again, and nothing in a Modelfile
+or a push carries it — it is a cookie-authenticated form in the web UI. The text
+is [`ollama-page.md`](ollama-page.md), the two ways to get it there are in
+[`OLLAMA-README.md`](OLLAMA-README.md), and `./check-ollama-page.sh` says
+whether the live page actually has it. **Copy from the raw file.** Pasting from
+a rendered view strips every heading, table and code fence while still looking
+like prose, which is exactly how this page spent its first evening.
+
 </details>
 
 Then she is simply a model. `ollama list` shows her, `ollama run jais/GLaDOS`
