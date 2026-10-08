@@ -1,0 +1,76 @@
+{
+  "measured_at": "2026-10-08T20:00:12Z",
+  "model": "jais/GLaDOS",
+  "payload_encoded_bytes": 13978,
+  "attempts": [
+    {
+      "route": "POST /jais/GLaDOS",
+      "credential": "anonymous",
+      "status": 401,
+      "note": "Unauthorized"
+    },
+    {
+      "route": "POST /jais/GLaDOS",
+      "credential": "signed key (root)",
+      "status": 401,
+      "note": "Unauthorized"
+    },
+    {
+      "route": "POST /jais/GLaDOS",
+      "credential": "signed key (ollama-user)",
+      "status": 401,
+      "note": "Unauthorized"
+    },
+    {
+      "route": "GET /v2/token",
+      "credential": "mint (root)",
+      "status": 200,
+      "note": "token issued"
+    },
+    {
+      "route": "POST /v2/.../uploads/",
+      "credential": "bearer (root)",
+      "status": 401,
+      "note": "not push-authorized"
+    },
+    {
+      "route": "POST /jais/GLaDOS",
+      "credential": "bearer (root)",
+      "status": 401,
+      "note": "Unauthorized"
+    },
+    {
+      "route": "GET /v2/token",
+      "credential": "mint (ollama-user)",
+      "status": 200,
+      "note": "token issued"
+    },
+    {
+      "route": "POST /v2/.../uploads/",
+      "credential": "bearer (ollama-user)",
+      "status": 401,
+      "note": "not push-authorized"
+    },
+    {
+      "route": "POST /jais/GLaDOS",
+      "credential": "bearer (ollama-user)",
+      "status": 401,
+      "note": "Unauthorized"
+    },
+    {
+      "route": "POST /api/me",
+      "credential": "signed key (root)",
+      "status": 401,
+      "note": "{\"error\":\"invalid credentials\"}"
+    },
+    {
+      "route": "POST /api/me",
+      "credential": "signed key (ollama-user)",
+      "status": 401,
+      "note": "{\"error\":\"invalid credentials\"}"
+    }
+  ],
+  "signer_rfc8032_vector": "pass",
+  "verdict": "human-only: every credential this host holds is refused 401 on the readme write; the route takes a browser session cookie and nothing else",
+  "page_bytes_after": 93003
+}

@@ -16,8 +16,29 @@ fetch("/jais/GLaDOS", {
 ```
 
 One form field, no CSRF token, authenticated purely by the browser session
-cookie — so an anonymous POST returns `401` and only a signed-in human can do
-it.
+cookie — so only a signed-in human can do it.
+
+That is a measurement, not an assumption. `tools/ollama_auth_probe.py` asks for
+this write **six ways** with the real 14 KB payload and every credential this
+machine holds, and re-reads the page afterwards:
+
+| credential | readme write |
+|---|--:|
+| anonymous | `401` |
+| signed key, both keys on this host | `401` |
+| registry bearer token, minted from `/v2/token` | `401` |
+| `POST /api/me`, the only identity API, both keys | `401` |
+
+The probe signs correctly — it checks its own Ed25519 implementation against
+RFC 8032 test vector 1 before trusting a result, and the registry really does
+issue it a token — so these are refusals, not malformed requests. The page's
+readme was byte-identical afterwards at 9,958 characters, so none of the
+refused writes wrote anything. Raw:
+`measurements/raw/ollama_readme_auth_probe.json`.
+
+One honest limit: no credential here could be shown to carry *push* rights
+either, so this does not separate "the route ignores registry tokens" from
+"this key is not authorized". Either way the write needs a browser.
 
 ## ⚠️ Copy the raw markdown, not the rendered page
 
