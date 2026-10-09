@@ -17,9 +17,35 @@ set -uo pipefail
 MODEL="${1:-jais/GLaDOS}"
 SRC="$(dirname "$0")/ollama-page.md"
 
+[ -f "$SRC" ] || { echo "COULD NOT MEASURE: $SRC not found"; exit 3; }
+
+# Pre-flight: the duplicate copy of the page text that disarms the stale
+# one-liner (see sync-page-text.sh) must still match this file. A drifted copy
+# would quietly hand an old readme to anyone who runs the line from the issue
+# thread, which is the exact failure that copy exists to prevent.
+HOWTO="$(dirname "$0")/OLLAMA-README.md"
+if [ -f "$HOWTO" ]; then
+  python3 - "$SRC" "$HOWTO" <<'PY' || exit 3
+import sys
+src = open(sys.argv[1], encoding="utf-8").read().strip()
+howto = open(sys.argv[2], encoding="utf-8").read()
+parts = howto.split("\n---\n", 1)
+if len(parts) != 2:
+    sys.exit("COULD NOT MEASURE: OLLAMA-README.md has no `---` separator, so "
+             "the stale one-liner from the issue thread would post an empty "
+             "readme again. Run ./sync-page-text.sh")
+tail = parts[1].strip()
+if tail.startswith("<!--") and "\n" in tail:
+    tail = tail.split("\n", 1)[1].strip()
+if tail != src:
+    sys.exit("COULD NOT MEASURE: the copy of the page text inside "
+             "OLLAMA-README.md has drifted from ollama-page.md (%d vs %d "
+             "chars). Run ./sync-page-text.sh" % (len(tail), len(src)))
+PY
+fi
+
 html="$(curl -fsS --max-time 30 "https://ollama.com/${MODEL}" 2>/dev/null)" || {
   echo "COULD NOT MEASURE: fetch of https://ollama.com/${MODEL} failed"; exit 3; }
-[ -f "$SRC" ] || { echo "COULD NOT MEASURE: $SRC not found"; exit 3; }
 
 printf '%s' "$html" | python3 -c '
 import html as H, re, sys

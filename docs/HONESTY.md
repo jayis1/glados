@@ -312,6 +312,62 @@ each series as the baseline and never as an event; six counting cases in
 off→on→off within one window (one event, not two) and already-on-and-reported-
 repeatedly (no event).
 
+**That fix was right about the hazard and wrong as written, and it cost the
+door sense its entire first day.** See the next section.
+
+## The opposite failure, which the phantom-knock fix caused
+
+The hazard above is real. Skipping the first point to avoid it is not, because
+it assumes the first point is always a baseline. A late one is not.
+
+Measured on this install: Home Assistant's `/api/history/period` admits that a
+change happened anywhere from 0 to **14.6 seconds** after it did — every sample
+in a six-sample run longer than the 5-second poll interval
+([`ha_touch_visibility.json`](../measurements/raw/ha_touch_visibility.json)).
+The ingest advanced its cursor to *now* on every poll, so a change that
+committed after the cursor passed it was never inside a window again. It
+reappeared only as the next window's first point, and the first point was being
+skipped by design.
+
+The result, read off the live service:
+
+| | |
+|---|---|
+| polls | 11,631 |
+| poll errors | 0 |
+| posts to the fly | 1,248, 0 failed |
+| thermal change ingested | 562 °C |
+| **door events counted** | **0** |
+| **transitions in HA's own recorder over the same 12 h** | **6** |
+
+Nothing errored. The thermometer channel was unaffected, because it compares
+each reading against the last *remembered* value instead of trusting a
+position, which is exactly the property the touch channel lacked.
+
+Replayed against those twelve hours of real transitions, through the deployed
+`_count` rather than a paraphrase of it, at the measured 14.6 s lag:
+
+| rule | counted |
+|---|--:|
+| before (no overlap, skip the first point) | **0 of 6** |
+| after (overlap, dedupe by timestamp, remembered state) | **6 of 6** |
+
+Three changes, and all three are needed: an overlap wider than the worst
+measured lag; a dedupe keyed on each point's own timestamp, without which the
+overlap would re-ring every doorbell and re-sum every degree for a minute; and
+a remembered per-entity state, so a baseline point can be informative without
+being a knock on its own — which is what keeps the phantom knock fixed. Eleven
+new counting cases in `test_ha_senses.py`, including the re-read window
+(1, 0, 0 events across three reads) and the first sighting of an already-`on`
+sensor (0 events).
+
+**What this cost in honesty:** the comment that closed this issue said *"she can
+feel the front door"* and *"live on your actual house right now: 223 polls, 0
+errors"*. The polls were real and the thermal half was real. The door half was
+proven by injected drive and by a fake Home Assistant, and never by a real
+transition — and a real transition would have failed. The counter that would
+have shown it was in `/health` the whole time, reading `touch_events: 0`.
+
 ## What one door event does, and the wrong explanation we reached for first
 
 The config comment originally claimed a single door sensor firing "reads
@@ -394,6 +450,7 @@ publishing measurements.
 | "The two T400s do 13.5 tok/s on the 7B, against 0.5 on the CPU." | **Withdrawn.** Does not reproduce. Three reps, variance under 0.03, full 29/29 offload confirmed in the loader log: **7.06 tok/s**, which is within noise of the tuned CPU's 7.39. The 0.5 figure was the *untuned* CPU default, since measured at 1.35–1.54. |
 | "Full GPU offload is the fast path for the language model." | **Withdrawn.** A T400 is a 64-bit-bus card and decode is bandwidth-bound. Flash attention changes nothing at these context lengths (7.42 vs 7.06, i.e. a no-op). The text model stays on the CPU, which also leaves both cards free for the fly. |
 | "Mechanosensory is the axis that would drive novelty, valence and reinforcement properly." | **Withdrawn for `reinforcement`.** Measured on the live engine before wiring: reinforcement is **exactly 0.0000** at every drive level from 0.02 to 0.40 ([`mechanosensory.json`](../measurements/raw/mechanosensory.json)). Hearing is the better of the two there (0.006–0.018) and still too weak to earn a phrase. Arousal (213 sd) and agitation (monotonic, 0.823 → 0.019) hold up; valence is rated usable at 9.0 sd but is still not monotonic. |
+| "She can feel the front door" (as of 8 October 2026) | **Was false for sixteen hours, now true and measured.** The wiring, the drive, the rescaling and the phrase table were all correct; the event counting dropped every real transition, so the nerve was never driven by the house. Proven by injected drive and a fake Home Assistant, which both passed. 0 of 6 real transitions counted, against 6 of 6 after the fix. The thermal half was unaffected throughout. |
 | "More threads are faster." | **Withdrawn, emphatically.** 10 threads: 8.18 tok/s. 20 threads (Ollama's own default on this box): **1.54 tok/s**. The cgroup straddles two NUMA nodes with only 10 full physical cores, so every extra thread buys cross-socket memory traffic. Raising it is not a free win; it collapses. |
 
 ---

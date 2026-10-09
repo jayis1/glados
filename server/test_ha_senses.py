@@ -49,6 +49,8 @@ def reset():
     ha_afferent._level.update({s: 0.0 for s in ha_afferent.OWNED})
     ha_afferent._posted.update({s: None for s in ha_afferent.OWNED})
     ha_afferent._last_temp.clear()
+    ha_afferent._last_touch.clear()
+    ha_afferent._last_seen_ts.clear()
     ha_afferent._cursor = None
 
 
@@ -141,6 +143,20 @@ def ser(eid, *states):
     return [{"entity_id": eid, "state": s} for s in states]
 
 
+T0 = datetime(2026, 10, 9, 12, 0, 0, tzinfo=timezone.utc)
+
+
+def tser(eid, *pairs):
+    """A series with real timestamps: (offset_seconds, state), ...
+
+    The dedupe that makes overlapping windows safe keys off these, so a test
+    that leaves them out is testing the undeduped path.
+    """
+    return [{"entity_id": eid, "state": s,
+             "last_changed": (T0 + timedelta(seconds=off)).isoformat()}
+            for off, s in pairs]
+
+
 print("=" * 72)
 print("1. counting events: exactly once, or the sense is wrong")
 print("=" * 72)
@@ -172,6 +188,97 @@ reset()
 n, _, _ = ha_afferent._count([ser(TOUCH[0], "off", "unavailable", "on")],
                              set(TOUCH), set(THERMO))
 check("a sensor going unavailable and back is one event, not a storm",
+      n == 1, "events=%d" % n)
+
+# ---------------------------------------------------------------------------
+# The failure that actually happened in the field: HA's history API makes a
+# change visible 0 to >12 s after it occurred, while the cursor moves on every
+# 5 s. A late event never lands inside a window again - it only reappears as
+# the next window's BASELINE point. Counting had to stop trusting that point's
+# position and start comparing it against the state remembered from the last
+# poll, or every real knock in this house was dropped. It was: three
+# transitions in HA's recorder, touch_events = 0.
+# ---------------------------------------------------------------------------
+reset()
+n1, _, _ = ha_afferent._count([ser(TOUCH[0], "off")], set(TOUCH), set(THERMO))
+n2, _, _ = ha_afferent._count([ser(TOUCH[0], "on")], set(TOUCH), set(THERMO))
+check("an event that commits after the cursor moved on is still counted",
+      (n1, n2) == (0, 1), "poll1=%d poll2=%d (0,0 is the field bug)" % (n1, n2))
+
+reset()
+ha_afferent._count([ser(TOUCH[0], "off")], set(TOUCH), set(THERMO))
+ha_afferent._count([ser(TOUCH[0], "on")], set(TOUCH), set(THERMO))
+n, _, _ = ha_afferent._count([ser(TOUCH[0], "on")], set(TOUCH), set(THERMO))
+check("and counted ONCE: the same baseline on the next poll is not a new knock",
+      n == 0, "events=%d" % n)
+
+reset()
+n, _, _ = ha_afferent._count([ser(TOUCH[0], "on", "off")], set(TOUCH), set(THERMO))
+check("a sensor first SEEN as on seeds silently: no invented knock on restart",
+      n == 0, "events=%d" % n)
+
+reset()
+ha_afferent._count([ser(TOUCH[0], "on")], set(TOUCH), set(THERMO))
+n, _, _ = ha_afferent._count([ser(TOUCH[0], "off", "on")], set(TOUCH), set(THERMO))
+check("a clear and a fresh press after a seeded `on` is one event",
+      n == 1, "events=%d" % n)
+
+reset()
+ha_afferent._count([ser(TOUCH[0], "off")], set(TOUCH), set(THERMO))
+n, _, _ = ha_afferent._count([ser(TOUCH[1], "on")], set(TOUCH), set(THERMO))
+check("each entity remembers its own state, so one sensor cannot mask another",
+      n == 0, "events=%d (TOUCH[1] seen for the first time)" % n)
+
+reset()
+ha_afferent._count([ser(TOUCH[0], "off")], set(TOUCH), set(THERMO))
+n, _, _ = ha_afferent._count([ser(TOUCH[0], "on", "off", "on")],
+                             set(TOUCH), set(THERMO))
+check("a late baseline plus live points in the same window counts every press",
+      n == 2, "events=%d" % n)
+
+# ---------------------------------------------------------------------------
+# Overlapping windows are how a late event gets caught with its real
+# timestamp instead of as a collapsed baseline. They are only safe because
+# every point is deduped by that timestamp. Without the dedupe the overlap is
+# strictly worse than the bug it fixes: one press would ring on every poll for
+# as long as the overlap lasts, and every degree would be re-counted.
+# ---------------------------------------------------------------------------
+reset()
+window = tser(TOUCH[0], (0, "off"), (12, "on"), (20, "off"))
+n1, _, _ = ha_afferent._count([window], set(TOUCH), set(THERMO))
+n2, _, _ = ha_afferent._count([window], set(TOUCH), set(THERMO))
+n3, _, _ = ha_afferent._count([window], set(TOUCH), set(THERMO))
+check("the same overlapping window re-read three times is still ONE event",
+      (n1, n2, n3) == (1, 0, 0), "events=%d,%d,%d" % (n1, n2, n3))
+
+reset()
+ha_afferent._count([tser(TOUCH[0], (0, "off"))], set(TOUCH), set(THERMO))
+# the overlap re-serves the old baseline and finally admits the press
+n, _, _ = ha_afferent._count([tser(TOUCH[0], (0, "off"), (3, "on"))],
+                             set(TOUCH), set(THERMO))
+check("an event visible only on the NEXT poll is counted with its own time",
+      n == 1, "events=%d" % n)
+
+reset()
+n1, _, d1 = ha_afferent._count([tser(THERMO[0], (0, "50.0"), (10, "53.0"))],
+                               set(TOUCH), set(THERMO))
+_, d2, _ = ha_afferent._count([tser(THERMO[0], (0, "50.0"), (10, "53.0"))],
+                              set(TOUCH), set(THERMO))
+check("a re-read window does not re-count the degrees it already summed",
+      abs(d2) < 1e-9, "second read added %.3f degC" % d2)
+
+reset()
+ha_afferent._count([tser(THERMO[0], (0, "50.0"))], set(TOUCH), set(THERMO))
+_, d, _ = ha_afferent._count([tser(THERMO[0], (0, "50.0"), (10, "53.0"))],
+                             set(TOUCH), set(THERMO))
+check("but a genuinely new reading inside an overlapping window still counts",
+      abs(d - 3.0) < 1e-6, "degC=%.3f" % d)
+
+reset()
+n, _, _ = ha_afferent._count(
+    [[{"entity_id": TOUCH[0], "state": "off"},
+      {"entity_id": TOUCH[0], "state": "on"}]], set(TOUCH), set(THERMO))
+check("a point with no readable timestamp is processed, never silently dropped",
       n == 1, "events=%d" % n)
 
 print()

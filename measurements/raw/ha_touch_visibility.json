@@ -1,0 +1,101 @@
+{
+  "issue": "IST-280",
+  "at": "2026-10-09T12:55:29.877636+00:00",
+  "poll_interval_s": 5.0,
+  "window_minutes": 720,
+  "touch_entity_count": 6,
+  "visibility_lag": {
+    "entity": "a numeric sensor that updates on its own",
+    "budget_s": 15.0,
+    "samples": [
+      {
+        "outcome": "seen",
+        "after_s": 13.09,
+        "changed_at": "2026-10-09T12:55:59.269293+00:00"
+      },
+      {
+        "outcome": "seen",
+        "after_s": 12.55,
+        "changed_at": "2026-10-09T12:56:29.796714+00:00"
+      },
+      {
+        "outcome": "seen",
+        "after_s": 0.01,
+        "changed_at": "2026-10-09T12:56:37.214151+00:00"
+      },
+      {
+        "outcome": "seen",
+        "after_s": 14.33,
+        "changed_at": "2026-10-09T12:56:43.380547+00:00"
+      },
+      {
+        "outcome": "seen",
+        "after_s": 0.0,
+        "changed_at": "2026-10-09T12:56:56.880043+00:00"
+      },
+      {
+        "outcome": "seen",
+        "after_s": 14.61,
+        "changed_at": "2026-10-09T12:56:58.066879+00:00"
+      }
+    ],
+    "seen": 6,
+    "not_seen_within_budget": 0,
+    "could_not_measure": 0,
+    "max_seen_s": 14.61,
+    "exceeds_poll_interval": true,
+    "poll_interval_s": 5.0
+  },
+  "replay_lag_s": 14.61,
+  "overlap_s": 60.0,
+  "entities": [
+    {
+      "entity": "touch[0]",
+      "recorded_on_transitions": 0,
+      "counted_old_rule": 0,
+      "counted_new_rule": 0,
+      "polls_replayed": 8640
+    },
+    {
+      "entity": "touch[1]",
+      "recorded_on_transitions": 0,
+      "counted_old_rule": 0,
+      "counted_new_rule": 0,
+      "polls_replayed": 8640
+    },
+    {
+      "entity": "touch[2]",
+      "recorded_on_transitions": 0,
+      "counted_old_rule": 0,
+      "counted_new_rule": 0,
+      "polls_replayed": 8640
+    },
+    {
+      "entity": "touch[3]",
+      "recorded_on_transitions": 0,
+      "counted_old_rule": 0,
+      "counted_new_rule": 0,
+      "polls_replayed": 8640
+    },
+    {
+      "entity": "touch[4]",
+      "recorded_on_transitions": 2,
+      "counted_old_rule": 0,
+      "counted_new_rule": 2,
+      "polls_replayed": 8640
+    },
+    {
+      "entity": "touch[5]",
+      "recorded_on_transitions": 4,
+      "counted_old_rule": 0,
+      "counted_new_rule": 4,
+      "polls_replayed": 8640
+    }
+  ],
+  "totals": {
+    "recorded_on_transitions": 6,
+    "counted_old_rule": 0,
+    "counted_new_rule": 6
+  },
+  "verdict": "old rule lost 6 of 6; new rule counts 6"
+}

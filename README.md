@@ -506,9 +506,10 @@ scars.
    most 0.3, never past 0.9. A caller that chose 0.2 chose determinism and
    keeps its floor.
 
-148 checks, 0 failures, against the live fly and real sockets:
+159 checks, 0 failures, against the live fly and real sockets:
 [`server/test_mood.py`](server/test_mood.py) (98) and
-[`server/test_ha_senses.py`](server/test_ha_senses.py) (50). The house's senses
+[`server/test_ha_senses.py`](server/test_ha_senses.py) (61) — 230 across
+all three suites, with [`server/test_senses.py`](server/test_senses.py) (71). The house's senses
 get the same treatment the coupling does — a closed port, a listener that
 accepts and then hangs, an unresolvable host, an HTTP 401, a malformed body —
 plus a fake Home Assistant for the counting, because a doorbell that is
@@ -551,6 +552,43 @@ empty, both API shapes.
 
 **A mood is an addition to who she is, never a replacement for it.**
 
+### The sixteen hours she could not feel the door
+
+The same shape again, and this one got all the way into a "done" comment.
+
+The door sense reported **11,631 polls, 0 poll errors, 1,248 successful posts
+to the fly and 562 °C of thermal change** — and **0 door events**, while Home
+Assistant's own recorder held six transitions over the same twelve hours.
+
+Home Assistant's `/api/history/period` admits a change happened between 0 and
+**14.6 seconds** after it did; every sample in a six-sample run was longer than
+the 5-second poll interval. The ingest moved its cursor to *now* on every poll,
+so an event that committed late was never inside a window again — it came back
+only as the next window's *first* point, and the first point was deliberately
+skipped, because counting it invents a knock at every restart for any sensor
+that happens to be `on`. Both halves of that were correct. Together they
+dropped every knock in the house.
+
+Replayed against those twelve hours of real transitions, through the deployed
+counting code rather than a paraphrase of it:
+
+| rule | counted |
+|---|--:|
+| before | **0 of 6** |
+| after | **6 of 6** |
+
+The fix is a window that overlaps by more than the worst measured lag, a dedupe
+keyed on each reading's own timestamp — without which the overlap would re-ring
+every doorbell for a minute — and a remembered per-sensor state, so a baseline
+reading can be informative without being a knock by itself. That last part is
+how the thermometer channel had always worked, which is why that one never lost
+a reading.
+
+The paragraph above says a dropped doorbell "is the sense not existing". It was
+written before this was found, and it was right.
+[`docs/HONESTY.md`](docs/HONESTY.md) carries both halves, and what claiming the
+door worked cost.
+
 ---
 
 ## What's in here
@@ -582,6 +620,8 @@ server/                layer 2 — mood → words
   proof_fly_centred.py   the end-to-end proof, with its control arm
   proof_byom.py          the fly drives a base it has never seen, with its control arm
   proof_ha_senses.py     a door event and a warm rack reaching her words
+  proof_touch_visibility.py  why the door sense counted nothing: Home
+                         Assistant's visibility lag, and 0 of 6 vs 6 of 6
 
 measurements/raw/      every number quoted anywhere, as the tool emitted it
 docs/                  the long versions

@@ -235,6 +235,38 @@ meant to be unpredictable.
 
 **A mood is an addition to who she is, never a replacement for it.**
 
+## And then she was deaf to the door for sixteen hours
+
+Same family of bug, found by distrusting a healthy-looking counter. The door
+sense reported **11,631 polls, 0 errors, 1,248 successful posts to the fly, 562
+degrees of thermal change** — and **0 door events**, while Home Assistant's own
+recorder held six.
+
+Home Assistant's history API admits a change happened somewhere between 0 and
+**14.6 seconds** after it did. The ingest asked for everything since its last
+poll and then moved its cursor to *now*, five seconds at a time. An event that
+committed late was never inside a window again: it came back only as the
+window's *baseline* reading, which the code skipped on purpose, because
+counting a baseline invents a knock at every restart for any sensor that
+happens to be `on`. Both halves were right. Together they threw away every
+knock in the house.
+
+Replayed against twelve hours of real recorded transitions:
+
+| rule | events counted |
+|---|--:|
+| before | **0 of 6** |
+| after | **6 of 6** |
+
+The fix is a window that overlaps by more than the worst measured lag, a dedupe
+by each reading's own timestamp so the overlap cannot re-ring a doorbell, and a
+remembered per-sensor state so a baseline is informative without being a knock
+by itself.
+
+The only symptom, for sixteen hours, was a GLaDOS who was never disturbed by
+anything — which is to say, a quiet house and a working system. **A sense that
+has never fired looks exactly like nothing happening.**
+
 ## What this is not
 
 - **Not a trained model.** The language organ is `qwen2.5:7b-instruct`, or

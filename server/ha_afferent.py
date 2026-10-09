@@ -91,6 +91,8 @@ _lock = threading.Lock()
 _level = {TOUCH_SITE: 0.0, THERMO_SITE: 0.0}
 _posted = {TOUCH_SITE: None, THERMO_SITE: None}
 _last_temp = {}            # entity_id -> last numeric value seen
+_last_touch = {}           # entity_id -> last state seen, across polls
+_last_seen_ts = {}         # entity_id -> timestamp of the last point consumed
 _cursor = None             # ISO timestamp: history has been read up to here
 _thread = None
 _stop = threading.Event()  # deliberately not named _stop on a Thread subclass
@@ -152,6 +154,46 @@ def _history(base, tok, entities, since, timeout):
         return json.loads(resp.read().decode("utf-8", "replace"))
 
 
+def _point_time(point):
+    """The timestamp of one history point, or None if it has none we can read.
+
+    None means "process this point": the failure this whole function exists to
+    stop is a dropped knock, so an unreadable timestamp must fall towards
+    counting rather than towards silence.
+    """
+    raw = point.get("last_changed") or point.get("last_updated")
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def _fresh(eid, series):
+    """The points of `series` not already consumed on an earlier poll.
+
+    Windows overlap on purpose (see `ha_overlap_s`), so the same change is
+    handed to us several times and must be counted once. Dedupe is by the
+    point's own timestamp rather than by its position: position is exactly what
+    could not be trusted. The baseline point HA synthesises at the start of a
+    window carries the window start as its timestamp, so on an overlapping
+    window it is older than what we have already seen and drops out here.
+    """
+    last = _last_seen_ts.get(eid)
+    out, newest = [], last
+    for point in series:
+        when = _point_time(point)
+        if when is not None and last is not None and when <= last:
+            continue
+        out.append(point)
+        if when is not None and (newest is None or when > newest):
+            newest = when
+    if newest is not None:
+        _last_seen_ts[eid] = newest
+    return out
+
+
 def _count(series_list, touch_set, thermo_set):
     """Transitions -> (touch events, aggregate degC of thermal change).
 
@@ -163,25 +205,47 @@ def _count(series_list, touch_set, thermo_set):
     events = 0
     degc = 0.0
     seen = 0
-    for series in series_list or ():
+    for raw_series in series_list or ():
+        if not raw_series:
+            continue
+        eid = raw_series[0].get("entity_id") or ""
+        seen += 1
+        series = _fresh(eid, raw_series)
         if not series:
             continue
-        eid = series[0].get("entity_id") or ""
-        seen += 1
         if eid in touch_set:
-            # The FIRST point of each series is the state at the start of the
-            # window, synthesised by HA rather than observed inside it - a real
-            # response has its last_changed set to exactly the `since` we asked
-            # for. So it is the baseline, never an event. Counting it would
-            # invent a knock on every restart for any sensor that happened to
-            # be `on` at the time, which for an indoor occupancy sensor is most
-            # of the day.
-            prev = series[0].get("state")
-            for point in series[1:]:
+            # Compare against the state remembered from the LAST poll, not
+            # against the first point of this window.
+            #
+            # The first point of a series is the state at the start of the
+            # window, synthesised by HA rather than observed inside it, so it
+            # must not be counted on its own: that would invent a knock on
+            # every restart for any sensor that happened to be `on`, which for
+            # an indoor occupancy sensor is most of the day.
+            #
+            # But skipping it outright loses real events, and in the field it
+            # lost ALL of them. /api/history/period makes a change visible
+            # anywhere from 0 to over 12 seconds after it happened (measured;
+            # measurements/raw/ha_history_visibility_lag.json), while the
+            # cursor advances to "now" every 5 s. An event that commits after
+            # the cursor has passed it is never inside a window again - it only
+            # ever reappears as a baseline point. Result: 11,436 error-free
+            # polls, three real transitions in Home Assistant's own recorder,
+            # and touch_events = 0.
+            #
+            # Remembering the state per entity instead makes the baseline point
+            # informative: `on` against a remembered `off` is the event we
+            # missed, counted exactly once, however late it arrives. An entity
+            # seen for the first time seeds silently, which is what keeps the
+            # restart case honest. This is how the thermometer channel below
+            # has always worked, and it is why that one never lost a reading.
+            prev = _last_touch.get(eid)
+            for point in series:
                 state = point.get("state")
-                if state == "on" and prev != "on":
+                if state == "on" and prev is not None and prev != "on":
                     events += 1
                 prev = state
+            _last_touch[eid] = prev
         elif eid in thermo_set:
             for point in series:
                 try:
@@ -264,13 +328,25 @@ def _poll_once(cfg, base, tok, dt):
     events, degc = 0, 0.0
 
     if watched:
-        since = _cursor or (datetime.now(timezone.utc)
-                            - timedelta(seconds=float(cfg.get("ha_backfill_s", 30)))
-                            ).isoformat()
+        # Windows OVERLAP, by more than Home Assistant's worst measured delay
+        # in admitting that a change happened (5.4 to 13.8 s on this install,
+        # every sample longer than the 5 s poll interval:
+        # measurements/raw/ha_touch_visibility.json). Without the overlap, an
+        # event that commits after the cursor has passed it is never inside a
+        # window again, and the door sense counted 0 of 6 real transitions in
+        # twelve hours. The overlap is only safe because _fresh() dedupes by
+        # each point's own timestamp; re-reading a window without that would
+        # re-ring every doorbell press and re-sum every degree.
+        overlap = timedelta(seconds=float(cfg.get("ha_overlap_s", 60.0)))
+        if _cursor:
+            since = (datetime.fromisoformat(_cursor) - overlap).isoformat()
+        else:
+            since = (datetime.now(timezone.utc)
+                     - timedelta(seconds=float(cfg.get("ha_backfill_s", 30)))
+                     ).isoformat()
         # Advance the cursor BEFORE counting, and to "now" rather than to the
-        # newest point we saw: a window that ends at the last event would
-        # re-count that event on every poll for as long as nothing else
-        # happened, and one doorbell press would ring forever.
+        # newest point we saw: a window that ended at the last event would keep
+        # that event as its own baseline for as long as nothing else happened.
         next_cursor = datetime.now(timezone.utc).isoformat()
         try:
             series = _history(base, tok, watched, since,
