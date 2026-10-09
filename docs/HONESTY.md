@@ -440,6 +440,70 @@ differences between `server/` and the deployed code.
 
 ---
 
+## The knock that has not happened yet
+
+The counting bug above is fixed and the fix is proved — but it is proved by
+**replay**, against twelve hours of transitions Home Assistant had already
+recorded. What has still never been observed is the thing the sense exists for:
+a real person opening a real door, counted by the live service as it happens.
+
+That gap cannot be closed by looking once. Here is the live service, nineteen
+minutes after the fix was deployed, cross-checked against Home Assistant's own
+recorder over the identical window:
+
+| | |
+|---|--:|
+| polls | 168 |
+| poll errors | 0 |
+| **door events counted** | **0** |
+| **transitions in HA's recorder** | **0** |
+
+Those two zeros agree, which is the best that can be said for them. **It is also
+exactly what the sixteen-hour outage looked like**, right up until somebody
+thought to ask the recorder a second question. Agreement at zero is not
+evidence; it is the absence of evidence, and the failure mode of this whole
+subsystem is that the two are indistinguishable by inspection.
+
+So the proof is left to arrive on its own.
+[`tools/xcheck_touch.py`](../tools/xcheck_touch.py) runs every ten minutes under
+a systemd timer and compares the cumulative live counter against HA's recorder,
+reporting one of five outcomes:
+
+| outcome | meaning |
+|---|---|
+| `AGREE_FIRED` | HA recorded transitions and the counter matched. **This is the proof. Nothing else in this section is.** |
+| `AGREE_QUIET` | Both zero. Consistent, and evidence of nothing. |
+| `UNDERCOUNT` | The counter is behind, and the missing presses were clustered inside HA's visibility lag — the accepted limit below. Not a defect. |
+| `MISMATCH` | A solitary knock went missing, or the counter is persistently ahead. The original bug, back. |
+| `COULD_NOT_MEASURE` | HA or `/health` was unreachable, or the service restarted and the counter re-anchored. |
+
+Three details that are the difference between an instrument and a decoration.
+It compares **cumulative** totals since the service started, not per-window
+deltas, because HA admits a change up to ~15 s late and a straggler at a window
+edge otherwise shows up as a phantom mismatch in one direction and then the
+other. It requires a gap to **survive two consecutive checks** before calling
+`MISMATCH`, for the same reason. And `COULD_NOT_MEASURE` exists at all because a
+checker that cannot report *"I failed to look"* reports *"broken"* instead, and
+is then ignored — which is how the original counter got trusted.
+
+All five outcomes are driven in
+[`tools/test_xcheck_touch.py`](../tools/test_xcheck_touch.py) against a real
+HTTP server: **13 passed, 0 failed**, including `AGREE_FIRED` itself. A verdict
+that has never been seen to fire is not evidence of anything, which is precisely
+the mistake that let the door sense ship dead.
+
+### The accepted limit, stated plainly
+
+Because Home Assistant can take up to ~15 seconds to admit a change, several
+presses inside that gap arrive in one window and read as **one** event. Single
+knocks, doorbell presses and motion all count correctly; only a rapid flurry
+under-counts. Closing that would mean subscribing to HA's websocket event stream
+instead of polling history — a different piece of work. The decision on record
+is that one knock is one knock, so the cross-check classifies a clustered
+shortfall as `UNDERCOUNT` and does not raise it as a defect.
+
+---
+
 ## Withdrawn claims
 
 Kept rather than deleted, because a project that only publishes its wins is not
@@ -450,7 +514,7 @@ publishing measurements.
 | "The two T400s do 13.5 tok/s on the 7B, against 0.5 on the CPU." | **Withdrawn.** Does not reproduce. Three reps, variance under 0.03, full 29/29 offload confirmed in the loader log: **7.06 tok/s**, which is within noise of the tuned CPU's 7.39. The 0.5 figure was the *untuned* CPU default, since measured at 1.35–1.54. |
 | "Full GPU offload is the fast path for the language model." | **Withdrawn.** A T400 is a 64-bit-bus card and decode is bandwidth-bound. Flash attention changes nothing at these context lengths (7.42 vs 7.06, i.e. a no-op). The text model stays on the CPU, which also leaves both cards free for the fly. |
 | "Mechanosensory is the axis that would drive novelty, valence and reinforcement properly." | **Withdrawn for `reinforcement`.** Measured on the live engine before wiring: reinforcement is **exactly 0.0000** at every drive level from 0.02 to 0.40 ([`mechanosensory.json`](../measurements/raw/mechanosensory.json)). Hearing is the better of the two there (0.006–0.018) and still too weak to earn a phrase. Arousal (213 sd) and agitation (monotonic, 0.823 → 0.019) hold up; valence is rated usable at 9.0 sd but is still not monotonic. |
-| "She can feel the front door" (as of 8 October 2026) | **Was false for sixteen hours, now true and measured.** The wiring, the drive, the rescaling and the phrase table were all correct; the event counting dropped every real transition, so the nerve was never driven by the house. Proven by injected drive and a fake Home Assistant, which both passed. 0 of 6 real transitions counted, against 6 of 6 after the fix. The thermal half was unaffected throughout. |
+| "She can feel the front door" (as of 8 October 2026) | **Was false for sixteen hours. Fixed, and proved by replay rather than by a door.** The wiring, the drive, the rescaling and the phrase table were all correct; the event counting dropped every real transition, so the nerve was never driven by the house. Proven by injected drive and a fake Home Assistant, which both passed. 0 of 6 real transitions counted, against 6 of 6 after the fix. The thermal half was unaffected throughout. The part that is **still not proved** is a real transition landing in the live counter — see "The knock that has not happened yet" below. |
 | "More threads are faster." | **Withdrawn, emphatically.** 10 threads: 8.18 tok/s. 20 threads (Ollama's own default on this box): **1.54 tok/s**. The cgroup straddles two NUMA nodes with only 10 full physical cores, so every extra thread buys cross-socket memory traffic. Raising it is not a free win; it collapses. |
 
 ---

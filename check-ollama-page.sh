@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # Is the readme on https://ollama.com/jais/GLaDOS, and is it the right text?
 #
-# Four outcomes, not two. A checker that can only say "good" or "bad" will say
+# Five outcomes, not two. A checker that can only say "good" or "bad" will say
 # "bad" when it simply failed to look, and that is how a page gets re-pasted for
-# no reason. Exit 0 = matches, 1 = on the page but wrong, 2 = no readme,
-# 3 = could not measure.
+# no reason. Exit 0 = both fields right, 1 = readme on the page but wrong,
+# 2 = no readme, 3 = could not measure, 4 = readme right, description not.
+#
+# 4 is its own outcome rather than folded into 1 because the two fields are
+# written by separate actions. "Re-paste the readme" and "set the description"
+# are different jobs, and reporting a correct readme as wrong is how you get
+# someone to redo work that already succeeded.
 #
 # This reads the STORED markdown, not the rendered HTML. The edit box
 # (<textarea id="editor">) is served to anonymous visitors with the saved source
@@ -16,8 +21,20 @@ set -uo pipefail
 
 MODEL="${1:-jais/GLaDOS}"
 SRC="$(dirname "$0")/ollama-page.md"
+DESC="$(dirname "$0")/ollama-description.txt"
 
-[ -f "$SRC" ] || { echo "COULD NOT MEASURE: $SRC not found"; exit 3; }
+[ -f "$SRC" ]  || { echo "COULD NOT MEASURE: $SRC not found";  exit 3; }
+[ -f "$DESC" ] || { echo "COULD NOT MEASURE: $DESC not found"; exit 3; }
+
+# ollama.com caps the description at 255 characters. A source file over the cap
+# can never match what the page stores, so this would otherwise report
+# INCOMPLETE forever and blame the human for not pasting it.
+desc_len=$(python3 -c 'import sys;print(len(open(sys.argv[1],encoding="utf-8").read().strip()))' "$DESC")
+if [ "$desc_len" -gt 255 ] || [ "$desc_len" -lt 40 ]; then
+  echo "COULD NOT MEASURE: ollama-description.txt is ${desc_len} characters;" \
+       "ollama.com allows 40-255, so it could never match the page."
+  exit 3
+fi
 
 # Pre-flight: the duplicate copy of the page text that disarms the stale
 # one-liner (see sync-page-text.sh) must still match this file. A drifted copy
@@ -41,6 +58,18 @@ if tail != src:
     sys.exit("COULD NOT MEASURE: the copy of the page text inside "
              "OLLAMA-README.md has drifted from ollama-page.md (%d vs %d "
              "chars). Run ./sync-page-text.sh" % (len(tail), len(src)))
+
+# The console routes used to bake the description into the one-liner itself.
+# Two copies of the same string is how the readme got out of step in the first
+# place, so they now fetch ollama-description.txt and this refuses to pass if a
+# literal creeps back - otherwise the page could hold a perfectly good
+# description that this checker reports as wrong, forever.
+import re
+baked = re.findall(r"summary:'[^']*'", howto)
+if baked:
+    sys.exit("COULD NOT MEASURE: %d one-liner(s) in OLLAMA-README.md hardcode a "
+             "description instead of fetching ollama-description.txt, so the two "
+             "can drift. Replace the literal with summary:D." % len(baked))
 PY
 fi
 
@@ -52,6 +81,7 @@ import html as H, re, sys
 
 page = sys.stdin.read()
 src  = open(sys.argv[1], encoding="utf-8").read()
+want_desc = open(sys.argv[2], encoding="utf-8").read().strip()
 
 def textarea(page, tid):
     """Contents of <textarea id=tid>. The closing tag is written </textarea\n>,
@@ -83,8 +113,11 @@ if not summary:
     desc = "EMPTY"
 elif re.fullmatch(r"https?://\S+", summary):
     desc = "a bare URL, not a description"
+elif summary == want_desc:
+    desc = "matches ollama-description.txt"
 else:
-    desc = "set"
+    desc = "set, but not the text in ollama-description.txt"
+desc_ok = summary == want_desc
 print(f"  description  {desc}: {summary[:70]!r}")
 
 if len(stored_n) < 40:
@@ -94,8 +127,14 @@ if len(stored_n) < 40:
 if stored_n == src_n:
     print(f"  readme       {len(stored_n)} chars, byte-identical to ollama-page.md")
     print()
-    print("OK: readme present, markdown intact, text current")
-    sys.exit(0)
+    if desc_ok:
+        print("OK: readme and description both present and current")
+        sys.exit(0)
+    print("INCOMPLETE: the readme is right; the description is not.")
+    print("The description is the one line ollama.com shows in search results,")
+    print("so it is read far more often than the readme. Set it with the Edit")
+    print("link beside the model name - the text is in ollama-description.txt.")
+    sys.exit(4)
 
 # It differs. Say how, because "stripped on paste" and "an older version" need
 # opposite fixes and look identical from a distance.
@@ -121,4 +160,4 @@ else:
     print(f"STALE: markdown is intact but the text is an older version "
           f"({len(drift)} words missing, e.g. {drift[:8]})")
 sys.exit(1)
-' "$SRC"
+' "$SRC" "$DESC"

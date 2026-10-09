@@ -170,6 +170,23 @@ unbroken wall of grey text — that is the rendered-view paste, and the fix is t
 go back to the raw link. This is the one failure that still reads fine
 afterwards, so it is worth the extra click.
 
+### Then the description, which is a second field
+
+Routes 2 and 3 do both fields in one action; Route 1 does not, so the one-line
+**description** under the model name needs its own paste. It is the line
+ollama.com puts in search results, so it is read by far more people than the
+readme — and right now it is a bare GitHub URL.
+
+1. Open <https://raw.githubusercontent.com/jayis1/glados/main/ollama-description.txt>
+2. `Ctrl+A`, `Ctrl+C`.
+3. Back on the model page, **Edit** beside the model *name* (not *Readme*),
+   `Ctrl+A`, `Ctrl+V`, **Save**.
+
+One line, no markdown, so there is nothing here that a rendered-view copy could
+strip. `./check-ollama-page.sh` reports `INCOMPLETE` until this is done and `OK`
+once it is — a correct readme is never reported as wrong just because the
+description is still pending.
+
 ## Route 2 — one line in the console, both fields at once
 
 Same endpoint, same session, no 13 KB in a textarea. **No clipboard is involved,
@@ -178,7 +195,7 @@ description in the same action. On the model page, signed in, press `F12` and go
 to **Console**:
 
 ```js
-(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const A=m=>alert('GLaDOS readme: '+m);const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();if(t.length<5000||!t.includes('## ')){A('NOTHING WRITTEN. The source fetch gave '+t.length+' chars with no headings, so nothing was posted. Check the raw URL.');return}const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;A(ok?'SAVED and verified - '+got.length+' chars, markdown intact. Reloading.':(d.status===401||r.status===401?'NOT SAVED (401) - this tab is signed out of ollama.com. Sign in, then run this again.':'NOT SAVED - description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars.'));if(ok)location.reload()})()
+(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const A=m=>alert('GLaDOS readme: '+m);const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();const D=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-description.txt')).text()).trim();if(t.length<5000||!t.includes('## ')){A('NOTHING WRITTEN. The source fetch gave '+t.length+' chars with no headings, so nothing was posted. Check the raw URL.');return}if(D.length<40||D.length>400||/^https?:\/\/\S+$/.test(D)){A('NOTHING WRITTEN. The description fetch gave '+D.length+' chars, which is not a description, so nothing was posted.');return}const d=await P({summary:D});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;A(ok?'SAVED and verified - '+got.length+' chars, markdown intact. Reloading.':(d.status===401||r.status===401?'NOT SAVED (401) - this tab is signed out of ollama.com. Sign in, then run this again.':'NOT SAVED - description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars.'));if(ok)location.reload()})()
 ```
 
 **It checks its own work.** After both writes it re-fetches the page with
@@ -214,7 +231,7 @@ a bookmark's URL field is not blocked.
 2. Name it `GLaDOS readme`; replace its URL with:
 
 ```
-javascript:(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const A=m=>alert('GLaDOS readme: '+m);const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();if(t.length<5000||!t.includes('## ')){A('NOTHING WRITTEN. The source fetch gave '+t.length+' chars with no headings, so nothing was posted. Check the raw URL.');return}const d=await P({summary:'An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados'});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;A(ok?'SAVED and verified - '+got.length+' chars, markdown intact. Reloading.':(d.status===401||r.status===401?'NOT SAVED (401) - this tab is signed out of ollama.com. Sign in, then run this again.':'NOT SAVED - description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars.'));if(ok)location.reload()})()
+javascript:(async()=>{const P=b=>fetch(location.pathname,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(b)});const A=m=>alert('GLaDOS readme: '+m);const t=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-page.md')).text()).trim();const D=(await(await fetch('https://raw.githubusercontent.com/jayis1/glados/main/ollama-description.txt')).text()).trim();if(t.length<5000||!t.includes('## ')){A('NOTHING WRITTEN. The source fetch gave '+t.length+' chars with no headings, so nothing was posted. Check the raw URL.');return}if(D.length<40||D.length>400||/^https?:\/\/\S+$/.test(D)){A('NOTHING WRITTEN. The description fetch gave '+D.length+' chars, which is not a description, so nothing was posted.');return}const d=await P({summary:D});const r=await P({readme:t});const h=await(await fetch(location.pathname,{cache:'no-store'})).text();const m=h.match(/<textarea[^>]*id="editor"[^>]*>([\s\S]*?)<\/textarea/);const got=m?new DOMParser().parseFromString(m[1],'text/html').documentElement.textContent.trim():'';const ok=got.includes('## ')&&Math.abs(got.length-t.length)<80;A(ok?'SAVED and verified - '+got.length+' chars, markdown intact. Reloading.':(d.status===401||r.status===401?'NOT SAVED (401) - this tab is signed out of ollama.com. Sign in, then run this again.':'NOT SAVED - description '+d.status+', readme '+r.status+'; the page is still holding '+got.length+' chars.'));if(ok)location.reload()})()
 ```
 
 3. Open <https://ollama.com/jais/GLaDOS> and click the bookmark. The page
@@ -234,13 +251,18 @@ the first thing anyone reads about her, and right now it says:
 https://github.com/jayis1/glados
 ```
 
-Which is a link, not a description. **Routes 2 and 3 set it for you**; this is
-the manual version. Click **Edit** beside it, select all, paste. 255 characters
-maximum, plain text, no markdown. Suggested (254):
+Which is a link, not a description. **Routes 2 and 3 set it for you**; Route 1's
+description step is the manual version. Click **Edit** beside it, select all,
+paste. 255 characters maximum, plain text, no markdown.
 
-```
-An AI whose moods come from a fruit fly. A 164,587-neuron Drosophila connectome runs continuously on two GPUs; its firing rates set her mood and sampling temperature. Swappable mouth, Qwen2.5-7B by default. Code and measurements: github.com/jayis1/glados
-```
+The text lives in **one place only** — [`ollama-description.txt`](ollama-description.txt),
+copied from
+<https://raw.githubusercontent.com/jayis1/glados/main/ollama-description.txt>.
+It used to be written out here as well as baked into both console lines, and
+three copies of a string is how the readme drifted out of step in the first
+place. `./check-ollama-page.sh` now refuses to pass if a copy reappears, so the
+page cannot end up holding a perfectly good description that the checker calls
+wrong forever.
 
 ## Will the markdown survive once it is pasted?
 

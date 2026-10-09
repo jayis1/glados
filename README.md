@@ -100,6 +100,14 @@ comparison rather than an inference. **Copy from the raw file.** Pasting from a
 rendered view strips every heading, table and code fence while still looking
 like prose, which is exactly how this page spent its first evening.
 
+The page's one-line **description** is a second field with its own form, and it
+is the line ollama.com puts in search results — so it is read far more often
+than the readme. Its text is [`ollama-description.txt`](ollama-description.txt),
+and the checker compares that too: `INCOMPLETE` means the readme is right and
+the description is not. That is its own outcome rather than a general failure,
+because the two fields are written by separate actions and telling someone their
+correct readme is wrong is how you get them to redo work that succeeded.
+
 </details>
 
 Then she is simply a model. `ollama list` shows her, `ollama run jais/GLaDOS`
@@ -589,6 +597,33 @@ written before this was found, and it was right.
 [`docs/HONESTY.md`](docs/HONESTY.md) carries both halves, and what claiming the
 door worked cost.
 
+### Which leaves one thing still unproved, and an instrument instead of a claim
+
+The fix is proved by **replay**. What has never been observed is a real person
+at a real door, counted by the live service as it happens — and that cannot be
+settled by looking once, because at the time of writing the live counter says 0
+door events and Home Assistant's recorder also says 0 over the same window.
+Those two zeros agree, and **that is exactly what the sixteen-hour outage looked
+like.** Agreement at zero is the absence of evidence.
+
+So the proof is left to arrive by itself. `tools/xcheck_touch.py` runs every ten
+minutes and compares the cumulative counter against HA's own recorder, reporting
+`AGREE_FIRED` (real transitions, all counted — the proof), `AGREE_QUIET` (both
+zero — consistent, and evidence of nothing), `UNDERCOUNT` (a flurry collapsed,
+the accepted limit), `MISMATCH` (the bug is back) or `COULD_NOT_MEASURE`.
+
+The last of those is not padding: a checker that cannot say *"I failed to look"*
+says *"broken"* instead, and is then ignored — which is how the original counter
+came to be trusted. All five outcomes are driven against a real HTTP server in
+`tools/test_xcheck_touch.py`, **13 passed, 0 failed**, including `AGREE_FIRED`,
+because a verdict that has never been seen to fire proves nothing.
+
+```bash
+python3 tools/xcheck_touch.py                       # one cross-check, now
+tail -1 measurements/xcheck_touch.jsonl             # the last verdict
+grep -c AGREE_FIRED measurements/xcheck_touch.jsonl # has a real door ever landed?
+```
+
 ---
 
 ## What's in here
@@ -622,6 +657,14 @@ server/                layer 2 — mood → words
   proof_ha_senses.py     a door event and a warm rack reaching her words
   proof_touch_visibility.py  why the door sense counted nothing: Home
                          Assistant's visibility lag, and 0 of 6 vs 6 of 6
+
+tools/                 the instruments
+  xcheck_touch.py        is the door sense agreeing with HA's own recorder?
+                         Five outcomes, on a ten-minute timer, so the first
+                         real knock proves the sense without being staged
+  test_xcheck_touch.py   all five outcomes against a real HTTP server
+  ollama_auth_probe.py   why only a browser can write the model page readme
+  ollama_page_render_survey.py  what ollama.com's renderer actually supports
 
 measurements/raw/      every number quoted anywhere, as the tool emitted it
 docs/                  the long versions
